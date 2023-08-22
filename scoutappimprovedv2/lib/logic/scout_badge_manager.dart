@@ -44,32 +44,28 @@ class ScoutBadgeManager {
         element == "https://scout.sg/" ||
         element == "http://intranet.scout.org.sg/");
 
+    _parsedUrls.removeWhere((element) {
+      List<ScoutBadge> list =
+          (db.scoutBadges.filter().urlEqualTo(element).findAllSync());
+
+      if (list.isEmpty) {
+        // Means it is not inside
+        return false;
+      } else {
+        return true;
+      }
+    });
+
     headlessWebView.dispose();
 
     Future.forEach(_parsedUrls, (String i) async {
-      //a
-      var existingBadges = await db.scoutBadges.where().findAll();
-      ScoutBadge? existingBadge =
-          existingBadges.firstWhere((badge) => badge.url == i,
-              orElse: () => ScoutBadge()
-                ..url = ""
-                ..name = "UNDEFINED"
-                ..description = ""
-                ..imageURL = "");
-
-      if (existingBadge.name != "UNDEFINED") {
-        // Badge with this URI already exists, skip refreshing it
-        return;
-      }
-
       HeadlessInAppWebView tempView = HeadlessInAppWebView(
         initialUrlRequest: URLRequest(url: Uri.parse(i)),
-        onLoadStop: (controller, url) async {},
       );
 
       await tempView.run();
 
-      await Future.delayed(const Duration(milliseconds: 3000));
+      await Future.delayed(const Duration(milliseconds: 5000));
 
       var image =
           await tempView.webViewController.evaluateJavascript(source: """

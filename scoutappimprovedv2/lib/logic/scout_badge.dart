@@ -1,6 +1,17 @@
 import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
 part 'scout_badge.g.dart';
+
+Future<Isar> getDB() async {
+  final dir = await getApplicationDocumentsDirectory();
+  try {
+    return await Isar.open([ScoutBadgeSchema],
+        directory: dir.path, inspector: true, name: "ScoutBadges");
+  } catch (e) {
+    return Isar.getInstance("ScoutBadges")!;
+  }
+}
 
 @collection
 class ScoutBadge {
