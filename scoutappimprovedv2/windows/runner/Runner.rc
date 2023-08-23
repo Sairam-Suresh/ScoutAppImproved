@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "scoutappimprovedv2" "\0"
+            VALUE "FileDescription", "Scouts App Improved" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "scoutappimprovedv2" "\0"
+            VALUE "InternalName", "Scouts App Improved" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "scoutappimprovedv2.exe" "\0"
-            VALUE "ProductName", "scoutappimprovedv2" "\0"
+            VALUE "ProductName", "Scouts App Improved" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
