@@ -7,7 +7,7 @@ Future<Isar> getDB() async {
   final dir = await getApplicationDocumentsDirectory();
   try {
     return await Isar.open([ScoutBadgeSchema],
-        directory: dir.path, inspector: true, name: "ScoutBadges");
+        directory: dir.path, name: "ScoutBadges");
   } catch (e) {
     return Isar.getInstance("ScoutBadges")!;
   }

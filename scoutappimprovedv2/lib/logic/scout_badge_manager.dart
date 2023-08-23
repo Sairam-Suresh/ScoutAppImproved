@@ -58,7 +58,7 @@ class ScoutBadgeManager {
 
     headlessWebView.dispose();
 
-    Future.forEach(_parsedUrls, (String i) async {
+    await Future.forEach(_parsedUrls, (String i) async {
       HeadlessInAppWebView tempView = HeadlessInAppWebView(
         initialUrlRequest: URLRequest(url: Uri.parse(i)),
       );
@@ -119,5 +119,7 @@ JSON.stringify(contentArray);
 
       tempView.dispose();
     });
+
+    return;
   }
 }
