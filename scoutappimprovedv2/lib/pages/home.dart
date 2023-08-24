@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/sheets/v4.dart' hide Padding;
 import 'package:isar/isar.dart';
@@ -35,7 +36,7 @@ class Home extends HookWidget {
       ValueNotifier<GoogleSignInAccount?> account,
     ) {
       return Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: StatefulBuilder(builder: (context, setState) {
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -183,12 +184,7 @@ class Home extends HookWidget {
                               //   }
                               // });
 
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return Dialog(
-                                        child: buildAccountDialog(account));
-                                  });
+                              context.go("/settings/");
                             },
                             child: CircleAvatar(
                                 child: Stack(

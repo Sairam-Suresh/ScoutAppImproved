@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:scoutappimprovedv2/pages/badge_viewer.dart';
 import 'package:scoutappimprovedv2/pages/home.dart';
+import 'package:scoutappimprovedv2/pages/settings.dart';
 import 'package:scoutappimprovedv2/pages/welcome.dart';
 
 void main() {
@@ -16,6 +17,11 @@ final _router = GoRouter(
           path: 'badge/:name',
           builder: (context, state) =>
               BadgeViewer(name: state.pathParameters["name"]!)),
+      GoRoute(
+        path: 'settings',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: Settings(), fullscreenDialog: true),
+      )
 
       // GoRoute(
       //     path: 'all_badges', builder: (context, state) => SeeAllBadgesView())
@@ -24,7 +30,7 @@ final _router = GoRouter(
         path: '/welcome',
         builder: (context, state) {
           return Welcome();
-        })
+        }),
   ],
 );
 
