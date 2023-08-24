@@ -32,70 +32,6 @@ class Home extends HookWidget {
     var sheetsApi = useState<SheetsApi?>(null);
     StreamSubscription<void>? listenerInstance;
 
-    Padding buildAccountDialog(
-      ValueNotifier<GoogleSignInAccount?> account,
-    ) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: StatefulBuilder(builder: (context, setState) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                onTap: account.value == null
-                    ? () {
-                        googleSignIn.signIn().then((value) {
-                          account.value = value;
-                          setState(() {});
-                        }).onError((error, stackTrace) {
-                          account.value = null;
-                        });
-                      }
-                    : null,
-                leading: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: CircleAvatar(
-                    child: ClipOval(
-                      child: (account.value?.photoUrl != null)
-                          ? Image.network(account.value!.photoUrl!)
-                          : const Icon(Icons.login),
-                    ),
-                  ),
-                ),
-                title: Text(
-                  (account.value?.displayName != null)
-                      ? account.value!.displayName!
-                      : "Unknown User",
-                  style: const TextStyle(fontSize: 18),
-                ),
-                trailing: (account.value != null)
-                    ? IconButton(
-                        onPressed: () {
-                          googleSignIn.signOut();
-                          account.value = null;
-                          setState(() {});
-                        },
-                        icon: const Icon(Icons.logout),
-                        color: Colors.red,
-                        padding: EdgeInsets.zero,
-                      )
-                    : null,
-              ),
-              if (!doneLoadingFromOnline.value)
-                const ListTile(
-                  title: Text("Badges are still loading"),
-                  trailing: SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator()),
-                ),
-            ],
-          );
-        }),
-      );
-    }
-
     useEffect(() {
       ScoutBadgeManager().parse().then((value) {
         doneLoadingFromOnline.value = true;
@@ -184,7 +120,8 @@ class Home extends HookWidget {
                               //   }
                               // });
 
-                              context.go("/settings/");
+                              context.go("/settings/",
+                                  extra: doneLoadingFromOnline.value);
                             },
                             child: CircleAvatar(
                                 child: Stack(

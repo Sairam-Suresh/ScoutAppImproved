@@ -19,8 +19,8 @@ final _router = GoRouter(
               BadgeViewer(name: state.pathParameters["name"]!)),
       GoRoute(
         path: 'settings',
-        pageBuilder: (context, state) =>
-            const MaterialPage(child: Settings(), fullscreenDialog: true),
+        pageBuilder: (context, state) => MaterialPage(
+            child: Settings(state.extra.toString()), fullscreenDialog: true),
       )
 
       // GoRoute(
