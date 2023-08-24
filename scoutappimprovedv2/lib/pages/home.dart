@@ -1,5 +1,5 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -26,11 +26,74 @@ class Home extends HookWidget {
     GoogleSignIn googleSignIn = GoogleSignIn(
       scopes: ['email', 'https://www.googleapis.com/auth/spreadsheets'],
     );
-
     var account = useState<GoogleSignInAccount?>(null);
-
     var searchController = useTextEditingController();
     var sheetsApi = useState<SheetsApi?>(null);
+    StreamSubscription<void>? listenerInstance;
+
+    Padding buildAccountDialog(
+      ValueNotifier<GoogleSignInAccount?> account,
+    ) {
+      return Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: StatefulBuilder(builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: account.value == null
+                    ? () {
+                        googleSignIn.signIn().then((value) {
+                          account.value = value;
+                          setState(() {});
+                        }).onError((error, stackTrace) {
+                          account.value = null;
+                        });
+                      }
+                    : null,
+                leading: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircleAvatar(
+                    child: ClipOval(
+                      child: (account.value?.photoUrl != null)
+                          ? Image.network(account.value!.photoUrl!)
+                          : const Icon(Icons.login),
+                    ),
+                  ),
+                ),
+                title: Text(
+                  (account.value?.displayName != null)
+                      ? account.value!.displayName!
+                      : "Unknown User",
+                  style: const TextStyle(fontSize: 18),
+                ),
+                trailing: (account.value != null)
+                    ? IconButton(
+                        onPressed: () {
+                          googleSignIn.signOut();
+                          account.value = null;
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.logout),
+                        color: Colors.red,
+                        padding: EdgeInsets.zero,
+                      )
+                    : null,
+              ),
+              if (!doneLoadingFromOnline.value)
+                const ListTile(
+                  title: Text("Badges are still loading"),
+                  trailing: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator()),
+                ),
+            ],
+          );
+        }),
+      );
+    }
 
     useEffect(() {
       ScoutBadgeManager().parse().then((value) {
@@ -39,21 +102,14 @@ class Home extends HookWidget {
 
       account.value = null;
 
-      googleSignIn.signInSilently(reAuthenticate: true).then((value) async {
-        if (value != null) {
-          var httpClient = (await googleSignIn.authenticatedClient())!;
-          sheetsApi.value = SheetsApi(httpClient);
-          account.value = value;
-        } else {
-          googleSignIn.signIn().then((value) async {
-            var httpClient = (await googleSignIn.authenticatedClient())!;
-            sheetsApi.value = SheetsApi(httpClient);
-            account.value = value;
-          });
-        }
+      googleSignIn.signInSilently(reAuthenticate: true).then((value) {
+        account.value = value;
+      }).onError((error, stackTrace) {
+        account.value = null;
       });
 
       return () {
+        listenerInstance?.cancel();
         db.data?.close();
       };
     }, []);
@@ -73,7 +129,7 @@ class Home extends HookWidget {
 
     useEffect(() {
       if (db.hasData) {
-        db.data!.scoutBadges
+        listenerInstance = db.data!.scoutBadges
             .watchLazy(fireImmediately: true)
             .listen((event) async {
           if (searchText.value == "") {
@@ -93,7 +149,7 @@ class Home extends HookWidget {
     }, [db.hasData]);
 
     return Scaffold(
-      body: badges.value != null && sheetsApi.value != null
+      body: badges.value != null // && sheetsApi.value != null
           ? SafeArea(
               bottom: false,
               child: Column(
@@ -131,8 +187,7 @@ class Home extends HookWidget {
                                   context: context,
                                   builder: (context) {
                                     return Dialog(
-                                      child: buildAccountDialog(account),
-                                    );
+                                        child: buildAccountDialog(account));
                                   });
                             },
                             child: CircleAvatar(
@@ -182,45 +237,6 @@ class Home extends HookWidget {
               ),
             )
           : const Center(child: CircularProgressIndicator()),
-    );
-  }
-
-  Padding buildAccountDialog(ValueNotifier<GoogleSignInAccount?> account) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: SizedBox(
-              width: 50,
-              height: 50,
-              child: CircleAvatar(
-                child: ClipOval(
-                  child: (account.value?.photoUrl != null)
-                      ? Image.network(account.value!.photoUrl!)
-                      : const Icon(Icons.person),
-                ),
-              ),
-            ),
-            title: Text((account.value?.displayName != null)
-                ? account.value!.displayName!
-                : "Unknown User"),
-            subtitle: AutoSizeText(
-              (account.value?.email != null) ? account.value!.email : "",
-              minFontSize: 10,
-              maxLines: 1,
-              style: const TextStyle(fontSize: 25),
-            ),
-          ),
-          OutlinedButton(
-              onPressed: () {},
-              child: Text(
-                "Logout",
-                style: TextStyle(color: Colors.red),
-              ))
-        ],
-      ),
     );
   }
 }

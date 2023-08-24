@@ -2,21 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:scoutappimprovedv2/pages/badge_viewer.dart';
 import 'package:scoutappimprovedv2/pages/home.dart';
+import 'package:scoutappimprovedv2/pages/welcome.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 final _router = GoRouter(
+  initialLocation: "/welcome",
   routes: [
     GoRoute(path: '/', builder: (context, state) => Home(), routes: [
       GoRoute(
           path: 'badge/:name',
           builder: (context, state) =>
               BadgeViewer(name: state.pathParameters["name"]!)),
+
       // GoRoute(
       //     path: 'all_badges', builder: (context, state) => SeeAllBadgesView())
     ]),
+    GoRoute(
+        path: '/welcome',
+        builder: (context, state) {
+          return Welcome();
+        })
   ],
 );
 
