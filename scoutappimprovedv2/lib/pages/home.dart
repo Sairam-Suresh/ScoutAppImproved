@@ -32,6 +32,13 @@ class Home extends HookWidget {
     var sheetsApi = useState<SheetsApi?>(null);
     StreamSubscription<void>? listenerInstance;
 
+    var isDarkMode =
+        useState(MediaQuery.of(context).platformBrightness == Brightness.dark);
+
+    useOnPlatformBrightnessChange((previous, current) {
+      isDarkMode.value = current == Brightness.dark;
+    });
+
     useEffect(() {
       ScoutBadgeManager().parse().then((value) {
         doneLoadingFromOnline.value = true;
@@ -93,67 +100,40 @@ class Home extends HookWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: SearchBar(
-                      hintText: "Search for Badges",
-                      onChanged: (text) {
-                        searchText.value = text;
-                      },
-                      leading: const Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Icon(Icons.search),
-                        ],
-                      ),
-                      controller: searchController,
-                      trailing: [
-                        if (searchText.value == "")
-                          GestureDetector(
-                            onTap: () {
-                              // googleSignIn.isSignedIn().then((value) {
-                              //   if (!value) {
-                              //     googleSignIn.signIn().then((value) {
-                              //       account.value = value;
-                              //       print(value?.photoUrl);
-                              //     });
-                              //   }
-                              // });
-
-                              context.go("/settings/",
-                                  extra: doneLoadingFromOnline.value);
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SearchBar(
+                            hintText: "Search for Badges",
+                            onChanged: (text) {
+                              searchText.value = text;
                             },
-                            child: CircleAvatar(
-                                child: Stack(
-                              alignment: Alignment.center,
+                            leading: const Row(
                               children: [
-                                doneLoadingFromOnline.value
-                                    ? Container()
-                                    : const SizedBox(
-                                        width: 70,
-                                        height: 70,
-                                        child: CircularProgressIndicator()),
-                                account.value == null
-                                    ? const Icon(Icons.person)
-                                    : SizedBox(
-                                        height: 50,
-                                        width: 50,
-                                        child: ClipOval(
-                                          child: Image.network(
-                                            account.value!.photoUrl!,
-                                          ),
-                                        ),
-                                      ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Icon(Icons.search),
                               ],
-                            )),
+                            ),
+                            controller: searchController,
+                            trailing: [
+                              if (searchText.value != "")
+                                IconButton(
+                                    onPressed: () {
+                                      searchText.value = "";
+                                      searchController.clear();
+                                    },
+                                    icon: const Icon(Icons.clear))
+                            ],
                           ),
-                        if (searchText.value != "")
-                          IconButton(
-                              onPressed: () {
-                                searchText.value = "";
-                                searchController.clear();
-                              },
-                              icon: const Icon(Icons.clear))
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        if (searchText.value == "")
+                          buildGoogleAvatar(context, doneLoadingFromOnline,
+                              account, isDarkMode),
                       ],
                     ),
                   ),
@@ -170,6 +150,61 @@ class Home extends HookWidget {
               ),
             )
           : const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  GestureDetector buildGoogleAvatar(
+      BuildContext context,
+      ValueNotifier<bool> doneLoadingFromOnline,
+      ValueNotifier<GoogleSignInAccount?> account,
+      ValueNotifier<bool> isDarkMode) {
+    return GestureDetector(
+      onTap: () {
+        context.go("/settings/", extra: doneLoadingFromOnline.value);
+      },
+      child: SizedBox(
+        height: 60,
+        width: 60,
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: !isDarkMode.value
+                    ? Colors.grey.withOpacity(0.8)
+                    : Colors.black.withOpacity(0.5),
+                blurStyle: BlurStyle.normal,
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: CircleAvatar(
+              child: Stack(
+            alignment: Alignment.center,
+            children: [
+              doneLoadingFromOnline.value
+                  ? Container()
+                  : const SizedBox(
+                      width: 70,
+                      height: 70,
+                      child: CircularProgressIndicator()),
+              account.value == null
+                  ? const Icon(Icons.person)
+                  : SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: ClipOval(
+                        child: Image.network(
+                          account.value!.photoUrl!,
+                        ),
+                      ),
+                    ),
+            ],
+          )),
+        ),
+      ),
     );
   }
 }
