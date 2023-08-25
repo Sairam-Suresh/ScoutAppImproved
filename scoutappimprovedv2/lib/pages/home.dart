@@ -140,13 +140,31 @@ class Home extends HookWidget {
                     ),
                   ),
                   Expanded(
-                    child: ListView(
-                      shrinkWrap: true,
-                      children: badges.value!
-                          .map((e) =>
-                              ScoutBadgeListTile(badge: e, onChange: () {}))
-                          .toList(),
-                    ),
+                    child: badges.value!.isNotEmpty
+                        ? ListView(
+                            shrinkWrap: true,
+                            children: badges.value!
+                                .map((e) => ScoutBadgeListTile(
+                                    badge: e, onChange: () {}))
+                                .toList(),
+                          )
+                        : const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "D:",
+                                  style: TextStyle(fontSize: 40),
+                                ),
+                                Text(
+                                  "No Badges Found with that search term",
+                                  style: TextStyle(fontSize: 30),
+                                  textAlign: TextAlign.center,
+                                )
+                              ],
+                            ),
+                          ),
                   ),
                 ],
               ),
