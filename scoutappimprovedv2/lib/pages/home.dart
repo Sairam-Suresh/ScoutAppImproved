@@ -123,6 +123,8 @@ class Home extends HookWidget {
                                     onPressed: () {
                                       searchText.value = "";
                                       searchController.clear();
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
                                     },
                                     icon: const Icon(Icons.clear))
                             ],
