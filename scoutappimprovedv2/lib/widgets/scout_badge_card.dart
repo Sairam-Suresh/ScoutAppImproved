@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 
-import '../logic/scout_badge.dart';
+import '../logic/scout_badge/scout_badge.dart';
 
 class ScoutBadgeCard extends HookWidget {
   ScoutBadgeCard({super.key, required this.badge, required this.onChange});

@@ -1,30 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:isar/isar.dart';
+import 'package:scoutappimprovedv2/logic/scout_badge/scout_badge.dart';
 
 class Settings extends HookWidget {
-  const Settings(this.finishedDownloadingFromOnline, {Key? key})
-      : super(key: key);
+  Settings(this.onAuthChanged, {Key? key}) : super(key: key) {
+    futureDB = getDB();
+  }
 
-  final String finishedDownloadingFromOnline;
+  dynamic futureDB;
+
+  final Function(bool logOut) onAuthChanged;
 
   @override
   Widget build(BuildContext context) {
-    var doneDownloadingScoutBadges =
-        useState(finishedDownloadingFromOnline == "false" ? false : true);
-
     var account = useState<GoogleSignInAccount?>(null);
-
-    GoogleSignIn googleSignIn = GoogleSignIn(
-      scopes: ['email', 'https://www.googleapis.com/auth/spreadsheets'],
-    );
+    AsyncSnapshot<Isar> db = useFuture(futureDB);
+    var isDBLoaded = useState(false);
 
     useEffect(() {
-      googleSignIn.signInSilently(reAuthenticate: true).then((value) {
+      if (db.hasData) {
+        isDBLoaded.value = true;
+      }
+
+      return null;
+    }, [db.hasData]);
+
+    useEffect(() {
+      GoogleSignIn().signInSilently(reAuthenticate: true).then((value) {
         account.value = value;
+        onAuthChanged(false);
       }).onError((error, stackTrace) {
-        googleSignIn.signIn().then((value) {
+        GoogleSignIn().signIn().then((value) {
           account.value = value;
+          onAuthChanged(false);
         });
       });
 
@@ -43,10 +53,12 @@ class Settings extends HookWidget {
             ListTile(
               onTap: account.value == null
                   ? () {
-                      googleSignIn.signIn().then((value) {
+                      GoogleSignIn().signIn().then((value) {
                         account.value = value;
+                        onAuthChanged(false);
                       }).onError((error, stackTrace) {
                         account.value = null;
+                        onAuthChanged(false);
                       });
                     }
                   : null,
@@ -71,8 +83,10 @@ class Settings extends HookWidget {
               trailing: (account.value != null)
                   ? IconButton(
                       onPressed: () {
-                        googleSignIn.signOut();
+                        GoogleSignIn().signOut();
+                        GoogleSignIn().disconnect();
                         account.value = null;
+                        onAuthChanged(true);
                       },
                       icon: const Icon(Icons.logout),
                       color: Colors.red,
@@ -80,13 +94,23 @@ class Settings extends HookWidget {
                     )
                   : null,
             ),
-            if (!doneDownloadingScoutBadges.value)
-              const ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text("Badges are still loading"),
-                trailing: SizedBox(
-                    height: 20, width: 20, child: CircularProgressIndicator()),
+            const SizedBox(
+              height: 8,
+            ),
+            const Text(
+              "Danger Zone",
+            ),
+            ListTile(
+              onTap: () {},
+              title: Text(
+                "Clear Caches",
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
+              leading: Icon(
+                Icons.delete_forever,
+                color: Theme.of(context).colorScheme.error,
+              ),
+            )
           ],
         ),
       ),

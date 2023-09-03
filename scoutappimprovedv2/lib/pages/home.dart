@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -8,29 +9,51 @@ import 'package:googleapis/sheets/v4.dart' hide Padding;
 import 'package:isar/isar.dart';
 import 'package:scoutappimprovedv2/widgets/scout_badge_list_tile.dart';
 
-import '../logic/scout_badge.dart';
-import '../logic/scout_badge_manager.dart';
+import '../logic/scout_badge/scout_badge.dart';
+import '../logic/scout_badge/scout_badge_manager.dart';
 
-class Home extends HookWidget {
-  Home({Key? key}) : super(key: key) {
-    futureDB = getDB();
+class Home extends StatefulHookWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  CancelableOperation? scoutBadgeLoaderSub;
+  var futureDB = getDB();
+  var doneLoadingFromOnline = false;
+  StreamSubscription<void>? listenerInstance;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    ScoutBadgeManager().parse().then((value) {
+      // The value is the boolean which tells us whether the parser is doing its thing or not doing it because another instance is already running
+      setState(() {
+        doneLoadingFromOnline = value;
+      });
+    });
+    super.initState();
   }
 
-  dynamic futureDB;
+  @override
+  void dispose() {
+    scoutBadgeLoaderSub?.cancel();
+    debugPrint((scoutBadgeLoaderSub?.isCanceled).toString());
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     AsyncSnapshot<Isar> db = useFuture(futureDB);
-    var doneLoadingFromOnline = useState(false);
+
     var badges = useState<List<ScoutBadge>?>(null);
-    var searchText = useState("");
     GoogleSignIn googleSignIn = GoogleSignIn(
       scopes: ['email', 'https://www.googleapis.com/auth/spreadsheets'],
     );
     var account = useState<GoogleSignInAccount?>(null);
-    var searchController = useTextEditingController();
     var sheetsApi = useState<SheetsApi?>(null);
-    StreamSubscription<void>? listenerInstance;
 
     var isDarkMode =
         useState(MediaQuery.of(context).platformBrightness == Brightness.dark);
@@ -40,10 +63,6 @@ class Home extends HookWidget {
     });
 
     useEffect(() {
-      ScoutBadgeManager().parse().then((value) {
-        doneLoadingFromOnline.value = true;
-      });
-
       account.value = null;
 
       googleSignIn.signInSilently(reAuthenticate: true).then((value) {
@@ -52,41 +71,18 @@ class Home extends HookWidget {
         account.value = null;
       });
 
-      return () {
-        listenerInstance?.cancel();
-        db.data?.close();
+      return () async {
+        await listenerInstance?.cancel();
+        await db.data?.close();
       };
     }, []);
-
-    useEffect(() {
-      if (db.hasData) {
-        db.data!.scoutBadges
-            .filter()
-            .nameContains(searchText.value)
-            .findAll()
-            .then((value) {
-          badges.value = value;
-        });
-      }
-      return null;
-    }, [searchText.value]);
 
     useEffect(() {
       if (db.hasData) {
         listenerInstance = db.data!.scoutBadges
             .watchLazy(fireImmediately: true)
             .listen((event) async {
-          if (searchText.value == "") {
-            badges.value = await db.data!.scoutBadges.where().findAll();
-          } else {
-            db.data!.scoutBadges
-                .filter()
-                .nameContains(searchText.value)
-                .findAll()
-                .then((value) {
-              badges.value = value;
-            });
-          }
+          badges.value = await db.data!.scoutBadges.where().findAll();
         });
       }
       return null;
@@ -103,39 +99,42 @@ class Home extends HookWidget {
                     child: Row(
                       children: [
                         Expanded(
-                          child: SearchBar(
-                            hintText: "Search for Badges",
-                            onChanged: (text) {
-                              searchText.value = text;
+                          child: SearchAnchor.bar(
+                            suggestionsBuilder: (BuildContext context,
+                                SearchController controller) {
+                              if (controller.text != "") {
+                                var temp =
+                                    badges.value?.asMap().values.toList();
+
+                                temp?.removeWhere((element) => !(element.name
+                                        ?.toLowerCase()
+                                        .contains(
+                                            controller.text.toLowerCase()) ??
+                                    false));
+
+                                return (temp?.map((e) => ScoutBadgeListTile(
+                                    badge: e, onChange: () {})))!;
+                              } else {
+                                return [];
+                              }
                             },
-                            leading: const Row(
-                              children: [
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Icon(Icons.search),
-                              ],
-                            ),
-                            controller: searchController,
-                            trailing: [
-                              if (searchText.value != "")
-                                IconButton(
-                                    onPressed: () {
-                                      searchText.value = "";
-                                      searchController.clear();
-                                      FocusManager.instance.primaryFocus
-                                          ?.unfocus();
-                                    },
-                                    icon: const Icon(Icons.clear))
-                            ],
                           ),
                         ),
                         const SizedBox(
                           width: 8,
                         ),
-                        if (searchText.value == "")
-                          buildGoogleAvatar(context, doneLoadingFromOnline,
-                              account, isDarkMode),
+                        buildGoogleAvatar(context, doneLoadingFromOnline,
+                            account, isDarkMode, googleSignIn, (isLogOut) {
+                          if (!isLogOut) {
+                            googleSignIn.signInSilently().then((value) {
+                              account.value = value;
+                            }).onError((error, stackTrace) {
+                              account.value = null;
+                            });
+                          } else {
+                            account.value = null;
+                          }
+                        }),
                       ],
                     ),
                   ),
@@ -161,7 +160,7 @@ class Home extends HookWidget {
                                   "No Badges Found with that search term",
                                   style: TextStyle(fontSize: 30),
                                   textAlign: TextAlign.center,
-                                )
+                                ),
                               ],
                             ),
                           ),
@@ -175,12 +174,14 @@ class Home extends HookWidget {
 
   GestureDetector buildGoogleAvatar(
       BuildContext context,
-      ValueNotifier<bool> doneLoadingFromOnline,
+      bool doneLoadingFromOnline,
       ValueNotifier<GoogleSignInAccount?> account,
-      ValueNotifier<bool> isDarkMode) {
+      ValueNotifier<bool> isDarkMode,
+      GoogleSignIn googleSignIn,
+      Function(bool logOut) onUpdate) {
     return GestureDetector(
       onTap: () {
-        context.go("/settings/", extra: doneLoadingFromOnline.value);
+        context.push("/settings/", extra: onUpdate);
       },
       child: SizedBox(
         height: 60,
@@ -204,7 +205,7 @@ class Home extends HookWidget {
               child: Stack(
             alignment: Alignment.center,
             children: [
-              doneLoadingFromOnline.value
+              doneLoadingFromOnline
                   ? Container()
                   : const SizedBox(
                       width: 70,

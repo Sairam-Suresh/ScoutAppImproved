@@ -51,3 +51,5 @@ app.*.map.json
 /android/app/build.gradle
 /android/build.gradle
 /ios/runner/Info.plist
+/android/signing.properties
+/android/signing_debug.properties
