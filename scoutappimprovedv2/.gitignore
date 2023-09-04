@@ -53,3 +53,4 @@ app.*.map.json
 /ios/runner/Info.plist
 /android/signing.properties
 /android/signing_debug.properties
+/lib/sensitive.dart
