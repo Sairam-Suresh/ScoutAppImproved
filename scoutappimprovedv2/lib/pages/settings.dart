@@ -110,7 +110,7 @@ class Settings extends HookWidget {
                 Icons.delete_forever,
                 color: Theme.of(context).colorScheme.error,
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../logic/scout_badge/scout_badge.dart';
 
 class ScoutBadgeListTile extends StatelessWidget {
-  ScoutBadgeListTile({super.key, required this.badge, required this.onChange});
+  const ScoutBadgeListTile(
+      {super.key, required this.badge, required this.onChange});
   final ScoutBadge badge;
   final VoidCallback onChange;
 
@@ -24,7 +25,8 @@ class ScoutBadgeListTile extends StatelessWidget {
               return Center(child: Image.file(image));
             },
             // Optional Placeholder widget until image loaded from url
-            placeHolder: const CircularProgressIndicator(),
+            placeHolder: const SizedBox(
+                width: 10, height: 10, child: CircularProgressIndicator()),
             // Optional error widget
             errorWidget: const Icon(Icons.error_outline),
             // Optional describe your image extensions default values are; jpg, jpeg, gif and png
