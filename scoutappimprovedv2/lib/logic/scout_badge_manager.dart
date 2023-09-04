@@ -1,10 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/sheets/v4.dart';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scoutappimprovedv2/logic/scout_badge/scout_badge.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../sensitive.dart';
 
 class ScoutBadgeManager {
   List<String> _parsedUrls = [];
@@ -131,5 +136,24 @@ JSON.stringify(contentArray);
     }
 
     return false; // Parser didnt parse as there is already another instance of it running.
+  }
+
+  Future<void> updateFromGSheets(GoogleSignInAccount account) async {
+    var db = await _getDB();
+
+    final credentials = ServiceAccountCredentials.fromJson(serviceAccountCreds);
+
+    final client = await clientViaServiceAccount(
+        credentials, [SheetsApi.spreadsheetsReadonlyScope]);
+    var sheets = SheetsApi(client);
+
+    final response =
+        await sheets.spreadsheets.values.get(spreadsheetId, "A2:A");
+
+    // db.scoutBadges.putAll(objects);
+
+    // (await db.scoutBadges.where().findAll())
+    // .map((element) {})
+    // .toList();
   }
 }
