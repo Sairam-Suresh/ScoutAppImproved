@@ -10,7 +10,7 @@ import 'package:isar/isar.dart';
 import 'package:scoutappimprovedv2/widgets/scout_badge_list_tile.dart';
 
 import '../logic/scout_badge/scout_badge.dart';
-import '../logic/scout_badge/scout_badge_manager.dart';
+import '../logic/scout_badge_manager.dart';
 
 class Home extends StatefulHookWidget {
   const Home({super.key});
@@ -27,7 +27,6 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    // TODO: implement initState
     ScoutBadgeManager().parse().then((value) {
       // The value is the boolean which tells us whether the parser is doing its thing or not doing it because another instance is already running
       setState(() {
