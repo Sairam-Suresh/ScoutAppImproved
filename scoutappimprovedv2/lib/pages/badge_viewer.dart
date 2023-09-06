@@ -58,10 +58,12 @@ class BadgeViewer extends HookWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: Image.network(
-                          badge.value!.imageURL!,
-                          height: 200,
-                          width: 200,
+                        child: Center(
+                          child: Image.network(
+                            badge.value!.imageURL!,
+                            height: 170,
+                            width: 170,
+                          ),
                         ),
                       ),
                       if (badge.value!.completed != null ||
