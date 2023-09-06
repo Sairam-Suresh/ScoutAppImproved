@@ -17,30 +17,30 @@ const ScoutBadgeSchema = CollectionSchema(
   name: r'ScoutBadge',
   id: -7852064247937518338,
   properties: {
-    r'completed': PropertySchema(
+    r'badgeGiven': PropertySchema(
       id: 0,
+      name: r'badgeGiven',
+      type: IsarType.string,
+    ),
+    r'certGiven': PropertySchema(
+      id: 1,
+      name: r'certGiven',
+      type: IsarType.string,
+    ),
+    r'completed': PropertySchema(
+      id: 2,
       name: r'completed',
-      type: IsarType.bool,
+      type: IsarType.string,
     ),
     r'description': PropertySchema(
-      id: 1,
+      id: 3,
       name: r'description',
       type: IsarType.string,
     ),
     r'imageURL': PropertySchema(
-      id: 2,
+      id: 4,
       name: r'imageURL',
       type: IsarType.string,
-    ),
-    r'isBadgeGiven': PropertySchema(
-      id: 3,
-      name: r'isBadgeGiven',
-      type: IsarType.bool,
-    ),
-    r'isCertGiven': PropertySchema(
-      id: 4,
-      name: r'isCertGiven',
-      type: IsarType.bool,
     ),
     r'name': PropertySchema(
       id: 5,
@@ -79,6 +79,24 @@ int _scoutBadgeEstimateSize(
 ) {
   var bytesCount = offsets.last;
   {
+    final value = object.badgeGiven;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.certGiven;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.completed;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.description;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -111,11 +129,11 @@ void _scoutBadgeSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.completed);
-  writer.writeString(offsets[1], object.description);
-  writer.writeString(offsets[2], object.imageURL);
-  writer.writeBool(offsets[3], object.isBadgeGiven);
-  writer.writeBool(offsets[4], object.isCertGiven);
+  writer.writeString(offsets[0], object.badgeGiven);
+  writer.writeString(offsets[1], object.certGiven);
+  writer.writeString(offsets[2], object.completed);
+  writer.writeString(offsets[3], object.description);
+  writer.writeString(offsets[4], object.imageURL);
   writer.writeString(offsets[5], object.name);
   writer.writeBool(offsets[6], object.parsedGoogleSheetInfo);
   writer.writeString(offsets[7], object.url);
@@ -128,12 +146,12 @@ ScoutBadge _scoutBadgeDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = ScoutBadge();
-  object.completed = reader.readBoolOrNull(offsets[0]);
-  object.description = reader.readStringOrNull(offsets[1]);
+  object.badgeGiven = reader.readStringOrNull(offsets[0]);
+  object.certGiven = reader.readStringOrNull(offsets[1]);
+  object.completed = reader.readStringOrNull(offsets[2]);
+  object.description = reader.readStringOrNull(offsets[3]);
   object.id = id;
-  object.imageURL = reader.readStringOrNull(offsets[2]);
-  object.isBadgeGiven = reader.readBoolOrNull(offsets[3]);
-  object.isCertGiven = reader.readBoolOrNull(offsets[4]);
+  object.imageURL = reader.readStringOrNull(offsets[4]);
   object.name = reader.readStringOrNull(offsets[5]);
   object.parsedGoogleSheetInfo = reader.readBoolOrNull(offsets[6]);
   object.url = reader.readStringOrNull(offsets[7]);
@@ -148,15 +166,15 @@ P _scoutBadgeDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readBoolOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readBoolOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readBoolOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
       return (reader.readStringOrNull(offset)) as P;
     case 6:
@@ -260,6 +278,311 @@ extension ScoutBadgeQueryWhere
 extension ScoutBadgeQueryFilter
     on QueryBuilder<ScoutBadge, ScoutBadge, QFilterCondition> {
   QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      badgeGivenIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'badgeGiven',
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      badgeGivenIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'badgeGiven',
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> badgeGivenEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'badgeGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      badgeGivenGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'badgeGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      badgeGivenLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'badgeGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> badgeGivenBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'badgeGiven',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      badgeGivenStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'badgeGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      badgeGivenEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'badgeGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      badgeGivenContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'badgeGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> badgeGivenMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'badgeGiven',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      badgeGivenIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'badgeGiven',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      badgeGivenIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'badgeGiven',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      certGivenIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'certGiven',
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      certGivenIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'certGiven',
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> certGivenEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'certGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      certGivenGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'certGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> certGivenLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'certGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> certGivenBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'certGiven',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      certGivenStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'certGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> certGivenEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'certGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> certGivenContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'certGiven',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> certGivenMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'certGiven',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      certGivenIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'certGiven',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      certGivenIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'certGiven',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
       completedIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -278,11 +601,135 @@ extension ScoutBadgeQueryFilter
   }
 
   QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> completedEqualTo(
-      bool? value) {
+    String? value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'completed',
         value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      completedGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'completed',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> completedLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'completed',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> completedBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'completed',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      completedStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'completed',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> completedEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'completed',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> completedContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'completed',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> completedMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'completed',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      completedIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'completed',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
+      completedIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'completed',
+        value: '',
       ));
     });
   }
@@ -645,62 +1092,6 @@ extension ScoutBadgeQueryFilter
     });
   }
 
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
-      isBadgeGivenIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'isBadgeGiven',
-      ));
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
-      isBadgeGivenIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'isBadgeGiven',
-      ));
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
-      isBadgeGivenEqualTo(bool? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'isBadgeGiven',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
-      isCertGivenIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'isCertGiven',
-      ));
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
-      isCertGivenIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'isCertGiven',
-      ));
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition>
-      isCertGivenEqualTo(bool? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'isCertGiven',
-        value: value,
-      ));
-    });
-  }
-
   QueryBuilder<ScoutBadge, ScoutBadge, QAfterFilterCondition> nameIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1030,6 +1421,30 @@ extension ScoutBadgeQueryLinks
 
 extension ScoutBadgeQuerySortBy
     on QueryBuilder<ScoutBadge, ScoutBadge, QSortBy> {
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByBadgeGiven() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'badgeGiven', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByBadgeGivenDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'badgeGiven', Sort.desc);
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByCertGiven() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'certGiven', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByCertGivenDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'certGiven', Sort.desc);
+    });
+  }
+
   QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'completed', Sort.asc);
@@ -1063,30 +1478,6 @@ extension ScoutBadgeQuerySortBy
   QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByImageURLDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'imageURL', Sort.desc);
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByIsBadgeGiven() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isBadgeGiven', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByIsBadgeGivenDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isBadgeGiven', Sort.desc);
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByIsCertGiven() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isCertGiven', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> sortByIsCertGivenDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isCertGiven', Sort.desc);
     });
   }
 
@@ -1131,6 +1522,30 @@ extension ScoutBadgeQuerySortBy
 
 extension ScoutBadgeQuerySortThenBy
     on QueryBuilder<ScoutBadge, ScoutBadge, QSortThenBy> {
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByBadgeGiven() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'badgeGiven', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByBadgeGivenDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'badgeGiven', Sort.desc);
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByCertGiven() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'certGiven', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByCertGivenDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'certGiven', Sort.desc);
+    });
+  }
+
   QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'completed', Sort.asc);
@@ -1179,30 +1594,6 @@ extension ScoutBadgeQuerySortThenBy
     });
   }
 
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByIsBadgeGiven() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isBadgeGiven', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByIsBadgeGivenDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isBadgeGiven', Sort.desc);
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByIsCertGiven() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isCertGiven', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByIsCertGivenDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isCertGiven', Sort.desc);
-    });
-  }
-
   QueryBuilder<ScoutBadge, ScoutBadge, QAfterSortBy> thenByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -1244,9 +1635,24 @@ extension ScoutBadgeQuerySortThenBy
 
 extension ScoutBadgeQueryWhereDistinct
     on QueryBuilder<ScoutBadge, ScoutBadge, QDistinct> {
-  QueryBuilder<ScoutBadge, ScoutBadge, QDistinct> distinctByCompleted() {
+  QueryBuilder<ScoutBadge, ScoutBadge, QDistinct> distinctByBadgeGiven(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'completed');
+      return query.addDistinctBy(r'badgeGiven', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QDistinct> distinctByCertGiven(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'certGiven', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<ScoutBadge, ScoutBadge, QDistinct> distinctByCompleted(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'completed', caseSensitive: caseSensitive);
     });
   }
 
@@ -1261,18 +1667,6 @@ extension ScoutBadgeQueryWhereDistinct
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'imageURL', caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QDistinct> distinctByIsBadgeGiven() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'isBadgeGiven');
-    });
-  }
-
-  QueryBuilder<ScoutBadge, ScoutBadge, QDistinct> distinctByIsCertGiven() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'isCertGiven');
     });
   }
 
@@ -1306,7 +1700,19 @@ extension ScoutBadgeQueryProperty
     });
   }
 
-  QueryBuilder<ScoutBadge, bool?, QQueryOperations> completedProperty() {
+  QueryBuilder<ScoutBadge, String?, QQueryOperations> badgeGivenProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'badgeGiven');
+    });
+  }
+
+  QueryBuilder<ScoutBadge, String?, QQueryOperations> certGivenProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'certGiven');
+    });
+  }
+
+  QueryBuilder<ScoutBadge, String?, QQueryOperations> completedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'completed');
     });
@@ -1321,18 +1727,6 @@ extension ScoutBadgeQueryProperty
   QueryBuilder<ScoutBadge, String?, QQueryOperations> imageURLProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'imageURL');
-    });
-  }
-
-  QueryBuilder<ScoutBadge, bool?, QQueryOperations> isBadgeGivenProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'isBadgeGiven');
-    });
-  }
-
-  QueryBuilder<ScoutBadge, bool?, QQueryOperations> isCertGivenProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'isCertGiven');
     });
   }
 

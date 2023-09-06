@@ -15,7 +15,7 @@ final _router = GoRouter(
     GoRoute(
         path: '/',
         pageBuilder: (context, state) =>
-            MaterialPage(child: Home(), maintainState: true),
+            const MaterialPage(child: Home(), maintainState: true),
         routes: [
           GoRoute(
               path: 'badge/:name',

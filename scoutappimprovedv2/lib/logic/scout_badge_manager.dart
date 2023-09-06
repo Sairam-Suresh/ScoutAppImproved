@@ -11,6 +11,45 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../sensitive.dart';
 
+List<List<String>> groupByMarker(List<String> inputList, String marker) {
+  List<List<String>> groupedLists = [];
+  List<String> currentGroup = [];
+
+  for (String item in inputList) {
+    if (item == marker) {
+      if (currentGroup.isNotEmpty) {
+        groupedLists.add(currentGroup);
+      }
+      currentGroup = [marker];
+    } else {
+      currentGroup.add(item);
+    }
+  }
+
+  // Add the last group if it's not empty
+  if (currentGroup.isNotEmpty) {
+    groupedLists.add(currentGroup);
+  }
+
+  return groupedLists;
+}
+
+List<Map<String, String>> combineLists(
+    List<List<String>> keysList, List<String> valuesList) {
+  List<Map<String, String>> result = [];
+  int valueIndex = 0;
+
+  for (int i = 0; i < keysList.length; i++) {
+    Map<String, String> data = {};
+    for (int j = 0; j < keysList[i].length; j++) {
+      data[keysList[i][j]] = valuesList[valueIndex++];
+    }
+    result.add(data);
+  }
+
+  return result;
+}
+
 class ScoutBadgeManager {
   List<String> _parsedUrls = [];
 
@@ -24,7 +63,7 @@ class ScoutBadgeManager {
     }
   }
 
-  Future<bool> parse() async {
+  Future<bool> parse(GoogleSignInAccount? account) async {
     var db = await _getDB();
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -118,18 +157,24 @@ JSON.stringify(contentArray);
           ..name = badgeName
           ..url = i
           ..description = description
-          ..imageURL = imageURL;
+          ..imageURL = imageURL
+          ..parsedGoogleSheetInfo = false
+          ..completed = null
+          ..badgeGiven = null
+          ..certGiven = null;
 
         // Add new badge to the database
 
-        await db.writeTxn(() async {
-          db.scoutBadges.put(newBadge);
-        });
+        await db.scoutBadges.put(newBadge);
 
         print(newBadge.name);
 
         tempView.dispose();
       });
+
+      if (account != null) {
+        await updateFromGSheets(account);
+      }
 
       prefs.setBool("already_processing_badges", false);
       return true; // Parser Successfully Completed
@@ -147,13 +192,77 @@ JSON.stringify(contentArray);
         credentials, [SheetsApi.spreadsheetsReadonlyScope]);
     var sheets = SheetsApi(client);
 
-    final response =
-        await sheets.spreadsheets.values.get(spreadsheetId, "A2:A");
+    final responseHeaderBadges =
+        (await sheets.spreadsheets.values.get(spreadsheetId, "E6:ZZZ6"))
+            .values![0]
+            .map((e) => e?.toString().replaceAll('\n', ""))
+            .toList();
 
+    final responseHeaderStats =
+        (await sheets.spreadsheets.values.get(spreadsheetId, "E7:ZZZ7"))
+            .values![0]
+            .map((e) => e?.toString().replaceAll('\n', ""))
+            .toList();
+
+    responseHeaderStats.removeWhere((element) => element == "");
+    responseHeaderBadges.removeWhere((element) => element == "");
+
+    final responsePeople =
+        (await sheets.spreadsheets.values.get(spreadsheetId, "B9:B"))
+            .values!
+            .map((e) => e.first)
+            .toList();
+
+    var userSheetIntPos = 9 + responsePeople.indexOf(account.email);
+
+    final responseUserDates = (await sheets.spreadsheets.values
+            .get(spreadsheetId, "E$userSheetIntPos:ZZZ$userSheetIntPos"))
+        .values![0]
+        .map((e) => e?.toString().replaceAll('\n', ""))
+        .toList();
+
+    print(responseHeaderBadges.length);
+    print(responseUserDates);
+    print(combineLists(
+            groupByMarker(
+                responseHeaderStats.map((e) => e!).toList(), "Completed"),
+            responseUserDates.map((e) => e!).toList())
+        .length);
+
+    for (int i = 0; i < responseHeaderBadges.length; i++) {
+      var targetBadge = responseHeaderBadges[i];
+      var targetStats = combineLists(
+          groupByMarker(
+              responseHeaderStats.map((e) => e!).toList(), "Completed"),
+          responseUserDates.map((e) => e!).toList())[i];
+
+      var scoutBadgeInDB = await db.scoutBadges
+          .filter()
+          .nameContains(targetBadge!.toLowerCase(), caseSensitive: false)
+          .findFirst();
+
+      scoutBadgeInDB
+        ?..parsedGoogleSheetInfo = true
+        ..completed = (targetStats.keys.contains("Completed"))
+            ? (targetStats["Completed"] != "")
+                ? targetStats["Completed"]
+                : null
+            : null
+        ..badgeGiven = (targetStats.keys.contains("Badge Given"))
+            ? (targetStats["Badge Given"] != "")
+                ? targetStats["Badge Given"]
+                : null
+            : null
+        ..certGiven = (targetStats.keys.contains("Cert Given"))
+            ? (targetStats["Cert Given"] != "")
+                ? targetStats["Cert Given"]
+                : null
+            : null;
+
+      if (scoutBadgeInDB != null) {
+        await db.writeTxn(() => db.scoutBadges.put(scoutBadgeInDB));
+      }
+    }
     // db.scoutBadges.putAll(objects);
-
-    // (await db.scoutBadges.where().findAll())
-    // .map((element) {})
-    // .toList();
   }
 }

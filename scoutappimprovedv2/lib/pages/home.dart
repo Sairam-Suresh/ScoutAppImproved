@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/sheets/v4.dart' hide Padding;
 import 'package:isar/isar.dart';
+import 'package:scoutappimprovedv2/widgets/scout_badge_card.dart';
 import 'package:scoutappimprovedv2/widgets/scout_badge_list_tile.dart';
 
 import '../logic/scout_badge/scout_badge.dart';
@@ -24,17 +25,6 @@ class _HomeState extends State<Home> {
   var futureDB = getDB();
   var doneLoadingFromOnline = false;
   StreamSubscription<void>? listenerInstance;
-
-  @override
-  void initState() {
-    ScoutBadgeManager().parse().then((value) {
-      // The value is the boolean which tells us whether the parser is doing its thing or not doing it because another instance is already running
-      setState(() {
-        doneLoadingFromOnline = value;
-      });
-    });
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -70,6 +60,13 @@ class _HomeState extends State<Home> {
         account.value = null;
       });
 
+      ScoutBadgeManager().parse(account.value).then((value) {
+        // The value is the boolean which tells us whether the parser is doing its thing or not doing it because another instance is already running
+        setState(() {
+          doneLoadingFromOnline = value;
+        });
+      });
+
       return () async {
         await listenerInstance?.cancel();
         await db.data?.close();
@@ -92,6 +89,7 @@ class _HomeState extends State<Home> {
           ? SafeArea(
               bottom: false,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -124,28 +122,72 @@ class _HomeState extends State<Home> {
                         ),
                         buildGoogleAvatar(context, doneLoadingFromOnline,
                             account, isDarkMode, googleSignIn, (isLogOut) {
-                          if (!isLogOut) {
-                            googleSignIn.signInSilently().then((value) {
-                              account.value = value;
-                            }).onError((error, stackTrace) {
-                              account.value = null;
-                            });
-                          } else {
+                          googleSignIn.signInSilently().then((value) {
+                            account.value = value;
+                          }).onError((error, stackTrace) {
                             account.value = null;
-                          }
+                          });
                         }),
                       ],
                     ),
                   ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      "Achieved Badges",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
                   Expanded(
+                      flex: 3,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 8.0, right: 8.0, bottom: 8.0),
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            ...(badges.value!.map((e) => (e.completed != null)
+                                ? SizedBox(child: ScoutBadgeCard(badge: e))
+                                : Container())).toList()
+                          ],
+                        ),
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "Other Badges",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        const Spacer(),
+                        FilledButton(
+                            onPressed: () {}, child: const Text("View all"))
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 6,
                     child: badges.value!.isNotEmpty
-                        ? ListView(
-                            shrinkWrap: true,
-                            children: badges.value!
-                                .map((e) => ScoutBadgeListTile(
-                                    badge: e, onChange: () {}))
-                                .toList(),
-                          )
+                        ? account.value != null
+                            ? RefreshIndicator(
+                                onRefresh: () => ScoutBadgeManager()
+                                    .updateFromGSheets(account.value!),
+                                child: ListView(
+                                  shrinkWrap: true,
+                                  children: badges.value!
+                                      .map((e) => ScoutBadgeListTile(
+                                          badge: e, onChange: () {}))
+                                      .toList(),
+                                ),
+                              )
+                            : ListView(
+                                shrinkWrap: true,
+                                children: badges.value!
+                                    .map((e) => ScoutBadgeListTile(
+                                        badge: e, onChange: () {}))
+                                    .toList(),
+                              )
                         : const Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Column(
@@ -207,8 +249,8 @@ class _HomeState extends State<Home> {
               doneLoadingFromOnline
                   ? Container()
                   : const SizedBox(
-                      width: 70,
-                      height: 70,
+                      width: 55,
+                      height: 55,
                       child: CircularProgressIndicator()),
               account.value == null
                   ? const Icon(Icons.person)

@@ -22,7 +22,7 @@ class ScoutBadge {
   late String? imageURL;
 
   late bool? parsedGoogleSheetInfo;
-  late bool? completed;
-  late bool? isBadgeGiven;
-  late bool? isCertGiven;
+  late String? completed;
+  late String? badgeGiven;
+  late String? certGiven;
 }

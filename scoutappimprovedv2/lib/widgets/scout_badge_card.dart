@@ -6,10 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../logic/scout_badge/scout_badge.dart';
 
 class ScoutBadgeCard extends HookWidget {
-  ScoutBadgeCard({super.key, required this.badge, required this.onChange});
+  const ScoutBadgeCard({super.key, required this.badge});
   final ScoutBadge badge;
-
-  final VoidCallback onChange;
 
   @override
   Widget build(BuildContext context) {
@@ -22,20 +20,16 @@ class ScoutBadgeCard extends HookWidget {
           height: double.infinity,
           child: Card(
             child: Padding(
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 children: [
-                  Row(children: [
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        onChange();
-                      },
-                      child: const CircleAvatar(
-                        child: Icon(Icons.star),
-                      ),
-                    )
-                  ]),
+                  Row(
+                    children: [
+                      Expanded(child: Container()),
+                      if (badge.completed != null)
+                        const Icon(Icons.check_circle),
+                    ],
+                  ),
                   Image.network(
                     badge.imageURL!,
                     width: 120,

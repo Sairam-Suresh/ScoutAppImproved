@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -12,6 +14,8 @@ class BadgeViewer extends HookWidget {
 
   var futureDB;
 
+  StreamSubscription? sub;
+
   final String name;
 
   @override
@@ -22,12 +26,13 @@ class BadgeViewer extends HookWidget {
     useEffect(() {
       return () {
         db.data?.close();
+        sub?.cancel();
       };
     }, []);
 
     useEffect(() {
       if (db.hasData) {
-        db.data!.scoutBadges
+        sub = db.data!.scoutBadges
             .watchLazy(fireImmediately: true)
             .listen((event) async {
           print("fired!");
@@ -49,10 +54,39 @@ class BadgeViewer extends HookWidget {
               padding: const EdgeInsets.only(bottom: 10.0, left: 10, right: 10),
               child: ListView(
                 children: [
-                  Image.network(
-                    badge.value!.imageURL!,
-                    height: 200,
-                    width: 200,
+                  Row(
+                    children: [
+                      Image.network(
+                        badge.value!.imageURL!,
+                        height: 200,
+                        width: 200,
+                      ),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (badge.value!.completed != null)
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text("Completed on"),
+                                    Text(badge.value!.completed!)
+                                  ]),
+                            if (badge.value!.badgeGiven != null)
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text("Badge given on"),
+                                    Text(badge.value!.badgeGiven!)
+                                  ]),
+                            if (badge.value!.certGiven != null)
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text("Certificate Given On"),
+                                    Text(badge.value!.certGiven!)
+                                  ])
+                          ])
+                    ],
                   ),
                   const SizedBox(
                     height: 10,
