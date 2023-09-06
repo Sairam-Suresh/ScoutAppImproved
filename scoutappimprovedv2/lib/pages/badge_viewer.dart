@@ -55,37 +55,54 @@ class BadgeViewer extends HookWidget {
               child: ListView(
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.network(
-                        badge.value!.imageURL!,
-                        height: 200,
-                        width: 200,
+                      Expanded(
+                        child: Image.network(
+                          badge.value!.imageURL!,
+                          height: 200,
+                          width: 200,
+                        ),
                       ),
-                      Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (badge.value!.completed != null)
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text("Completed on"),
-                                    Text(badge.value!.completed!)
-                                  ]),
-                            if (badge.value!.badgeGiven != null)
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text("Badge given on"),
-                                    Text(badge.value!.badgeGiven!)
-                                  ]),
-                            if (badge.value!.certGiven != null)
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text("Certificate Given On"),
-                                    Text(badge.value!.certGiven!)
-                                  ])
-                          ])
+                      Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (badge.value!.completed != null)
+                                Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text("Completed on"),
+                                      Text(
+                                        badge.value!.completed!,
+                                        style: const TextStyle(fontSize: 30),
+                                      )
+                                    ]),
+                              if (badge.value!.badgeGiven != null)
+                                Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text("Badge given on"),
+                                      Text(
+                                        badge.value!.badgeGiven!,
+                                        style: const TextStyle(fontSize: 30),
+                                      )
+                                    ]),
+                              if (badge.value!.certGiven != null)
+                                Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text("Certificate Given On"),
+                                      Text(
+                                        badge.value!.certGiven!,
+                                        style: const TextStyle(fontSize: 30),
+                                      )
+                                    ])
+                            ]),
+                      )
                     ],
                   ),
                   const SizedBox(
