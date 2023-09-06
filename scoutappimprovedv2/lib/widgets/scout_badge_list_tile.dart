@@ -5,10 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../logic/scout_badge/scout_badge.dart';
 
 class ScoutBadgeListTile extends StatelessWidget {
-  const ScoutBadgeListTile(
-      {super.key, required this.badge, required this.onChange});
+  const ScoutBadgeListTile({super.key, required this.badge});
   final ScoutBadge badge;
-  final VoidCallback onChange;
 
   @override
   Widget build(BuildContext context) {

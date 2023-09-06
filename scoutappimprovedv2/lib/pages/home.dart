@@ -23,15 +23,16 @@ class _HomeState extends State<Home> {
   var futureDB = getDB();
   var doneLoadingFromOnline = false;
   StreamSubscription<void>? listenerInstance;
+  GoogleSignIn googleSignIn = GoogleSignIn(
+    scopes: ['email', 'https://www.googleapis.com/auth/spreadsheets'],
+  );
 
   @override
   Widget build(BuildContext context) {
     AsyncSnapshot<Isar> db = useFuture(futureDB);
 
     var badges = useState<List<ScoutBadge>?>(null);
-    GoogleSignIn googleSignIn = GoogleSignIn(
-      scopes: ['email', 'https://www.googleapis.com/auth/spreadsheets'],
-    );
+
     var account = useState<GoogleSignInAccount?>(null);
     var sheetsApi = useState<SheetsApi?>(null);
 
@@ -51,14 +52,14 @@ class _HomeState extends State<Home> {
         account.value = null;
       });
 
-      var scoutBadgeManagerSub;
+      StreamSubscription<ScoutBadge?>? scoutBadgeManagerSub;
 
-      futureDB.then((value1) {
+      futureDB.then((obtainedDBInstance) {
         scoutBadgeManagerSub = ScoutBadgeManager().parse(account.value).listen(
             (value) {
               if (value != null) {
-                value1.writeTxn(() async {
-                  await value1.scoutBadges.put(value);
+                obtainedDBInstance.writeTxn(() async {
+                  await obtainedDBInstance.scoutBadges.put(value);
                 });
               }
             },
@@ -73,7 +74,7 @@ class _HomeState extends State<Home> {
       return () async {
         await listenerInstance?.cancel();
         await db.data?.close();
-        await scoutBadgeManagerSub.cancel();
+        await scoutBadgeManagerSub?.cancel();
       };
     }, []);
 
@@ -113,8 +114,8 @@ class _HomeState extends State<Home> {
                                             controller.text.toLowerCase()) ??
                                     false));
 
-                                return (temp?.map((e) => ScoutBadgeListTile(
-                                    badge: e, onChange: () {})))!;
+                                return (temp?.map(
+                                    (e) => ScoutBadgeListTile(badge: e)))!;
                               } else {
                                 return [];
                               }
@@ -142,8 +143,8 @@ class _HomeState extends State<Home> {
                         padding: const EdgeInsets.only(
                             left: 8.0, right: 8.0, bottom: 8.0),
                         child: GridView.count(
-                          crossAxisCount: 3,
-                          // scrollDirection: Axis.horizontal,
+                          crossAxisCount: 1,
+                          scrollDirection: Axis.horizontal,
                           children: [
                             ...((() {
                               var tempBadges =
@@ -182,16 +183,14 @@ class _HomeState extends State<Home> {
                                 child: ListView(
                                   shrinkWrap: true,
                                   children: badges.value!
-                                      .map((e) => ScoutBadgeListTile(
-                                          badge: e, onChange: () {}))
+                                      .map((e) => ScoutBadgeListTile(badge: e))
                                       .toList(),
                                 ),
                               )
                             : ListView(
                                 shrinkWrap: true,
                                 children: badges.value!
-                                    .map((e) => ScoutBadgeListTile(
-                                        badge: e, onChange: () {}))
+                                    .map((e) => ScoutBadgeListTile(badge: e))
                                     .toList(),
                               )
                         : const Padding(
