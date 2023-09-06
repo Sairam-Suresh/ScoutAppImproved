@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,7 +10,23 @@ class Welcome extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    var index = useState(0);
+    var account = useState<GoogleSignInAccount?>(null);
+
     return IntroductionScreen(
+      onChange: (indexPage) {
+        index.value = indexPage;
+      },
+      canProgress: (indexPage) {
+        if (indexPage != 2) {
+          return true;
+        } else {
+          return account.value == null ? false : true;
+        }
+      },
+      showBackButton: index.value != 2,
+      showDoneButton: account.value != null,
+      back: const Text("Go back"),
       pages: [
         PageViewModel(
           title: "Welcome to the Revamped Scouts App!",
@@ -45,11 +62,35 @@ class Welcome extends HookWidget {
         ),
         PageViewModel(
           title: "Before we begin...",
-          bodyWidget: const Column(
+          bodyWidget: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("This App will prompt you to login with google"),
-              Text("Please login with your google account when prompted")
+              const Text(
+                "Please log in with your Google Account, so that we can obtain your badges!",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 25),
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              FilledButton(
+                  onPressed: () {
+                    GoogleSignIn().signIn().then((value) {
+                      account.value = value;
+                    }).onError((error, stackTrace) {});
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text("Sign in with Google"),
+                      if (account.value != null) const Icon(Icons.check)
+                    ],
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              if (account.value != null)
+                Text("Signed in as ${account.value!.displayName}"),
             ],
           ),
           image: const Center(
