@@ -15,7 +15,7 @@ final _router = GoRouter(
     GoRoute(
         path: '/',
         pageBuilder: (context, state) =>
-            const MaterialPage(child: Home(), maintainState: true),
+            const MaterialPage(child: Home(), maintainState: false),
         routes: [
           GoRoute(
               path: 'badge/:name',
@@ -24,7 +24,7 @@ final _router = GoRouter(
           GoRoute(
             path: 'settings',
             pageBuilder: (context, state) => MaterialPage(
-                child: Settings(state.extra as Function(bool logOut)),
+                child: Settings(),
                 fullscreenDialog: true,
                 maintainState: false),
           )

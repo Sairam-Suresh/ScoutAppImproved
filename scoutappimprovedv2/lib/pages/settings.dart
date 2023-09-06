@@ -5,13 +5,11 @@ import 'package:isar/isar.dart';
 import 'package:scoutappimprovedv2/logic/scout_badge/scout_badge.dart';
 
 class Settings extends HookWidget {
-  Settings(this.onAuthChanged, {Key? key}) : super(key: key) {
+  Settings({Key? key}) : super(key: key) {
     futureDB = getDB();
   }
 
   dynamic futureDB;
-
-  final Function(bool logOut) onAuthChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +28,9 @@ class Settings extends HookWidget {
     useEffect(() {
       GoogleSignIn().signInSilently(reAuthenticate: true).then((value) {
         account.value = value;
-        onAuthChanged(false);
       }).onError((error, stackTrace) {
         GoogleSignIn().signIn().then((value) {
           account.value = value;
-          onAuthChanged(false);
         });
       });
 
@@ -55,10 +51,8 @@ class Settings extends HookWidget {
                   ? () {
                       GoogleSignIn().signIn().then((value) {
                         account.value = value;
-                        onAuthChanged(false);
                       }).onError((error, stackTrace) {
                         account.value = null;
-                        onAuthChanged(false);
                       });
                     }
                   : null,
@@ -86,7 +80,6 @@ class Settings extends HookWidget {
                         GoogleSignIn().signOut();
                         GoogleSignIn().disconnect();
                         account.value = null;
-                        onAuthChanged(true);
                       },
                       icon: const Icon(Icons.logout),
                       color: Colors.red,

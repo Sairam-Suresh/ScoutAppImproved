@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -21,17 +20,9 @@ class Home extends StatefulHookWidget {
 }
 
 class _HomeState extends State<Home> {
-  CancelableOperation? scoutBadgeLoaderSub;
   var futureDB = getDB();
   var doneLoadingFromOnline = false;
   StreamSubscription<void>? listenerInstance;
-
-  @override
-  void dispose() {
-    scoutBadgeLoaderSub?.cancel();
-    debugPrint((scoutBadgeLoaderSub?.isCanceled).toString());
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,16 +51,27 @@ class _HomeState extends State<Home> {
         account.value = null;
       });
 
-      ScoutBadgeManager().parse(account.value).then((value) {
-        // The value is the boolean which tells us whether the parser is doing its thing or not doing it because another instance is already running
-        setState(() {
-          doneLoadingFromOnline = value;
-        });
+      var scoutBadgeManagerSub;
+
+      futureDB.then((value1) {
+        scoutBadgeManagerSub = ScoutBadgeManager().parse(account.value).listen(
+            (value) {
+              if (value != null) {
+                value1.writeTxn(() async {
+                  await value1.scoutBadges.put(value);
+                });
+              }
+            },
+            onError: (error, trace) {},
+            onDone: () {
+              doneLoadingFromOnline = true;
+            });
       });
 
       return () async {
         await listenerInstance?.cancel();
         await db.data?.close();
+        await scoutBadgeManagerSub.cancel();
       };
     }, []);
 
@@ -121,13 +123,7 @@ class _HomeState extends State<Home> {
                           width: 8,
                         ),
                         buildGoogleAvatar(context, doneLoadingFromOnline,
-                            account, isDarkMode, googleSignIn, (isLogOut) {
-                          googleSignIn.signInSilently().then((value) {
-                            account.value = value;
-                          }).onError((error, stackTrace) {
-                            account.value = null;
-                          });
-                        }),
+                            account, isDarkMode, googleSignIn),
                       ],
                     ),
                   ),
@@ -218,11 +214,10 @@ class _HomeState extends State<Home> {
       bool doneLoadingFromOnline,
       ValueNotifier<GoogleSignInAccount?> account,
       ValueNotifier<bool> isDarkMode,
-      GoogleSignIn googleSignIn,
-      Function(bool logOut) onUpdate) {
+      GoogleSignIn googleSignIn) {
     return GestureDetector(
       onTap: () {
-        context.push("/settings/", extra: onUpdate);
+        context.push("/settings/");
       },
       child: SizedBox(
         height: 60,

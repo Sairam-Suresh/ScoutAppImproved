@@ -63,76 +63,74 @@ class ScoutBadgeManager {
     }
   }
 
-  Future<bool> parse(GoogleSignInAccount? account) async {
+  Stream<ScoutBadge?> parse(GoogleSignInAccount? account) async* {
     var db = await _getDB();
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    if (!(prefs.getBool("already_processing_badges") ?? false)) {
-      prefs.setBool("already_processing_badges", true);
+    // if (!(prefs.getBool("already_processing_badges") ?? false)) {
+    // prefs.setBool("already_processing_badges", true);
 
-      var headlessWebView = HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(
-            url: Uri.parse(
-                "https://app.scout.sg/#/scouts/scouts_gridview/scouts")),
-      );
-      await headlessWebView.run();
+    var headlessWebView = HeadlessInAppWebView(
+      initialUrlRequest: URLRequest(
+          url: Uri.parse(
+              "https://app.scout.sg/#/scouts/scouts_gridview/scouts")),
+    );
+    await headlessWebView.run();
 
-      await Future.delayed(const Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 5));
 
-      var urls =
-          await headlessWebView.webViewController.evaluateJavascript(source: """
+    var urls =
+        await headlessWebView.webViewController.evaluateJavascript(source: """
               JSON.stringify(
                 Array.from(document.getElementsByTagName('a'))
                   .map(img => img.href)
               )
               """);
-      _parsedUrls = List<String>.from(jsonDecode(urls));
+    _parsedUrls = List<String>.from(jsonDecode(urls));
 
-      // Filter out the garbage
-      _parsedUrls.removeWhere((element) =>
-          element == "https://scout.sg/" ||
-          element == "http://intranet.scout.org.sg/");
+    // Filter out the garbage
+    _parsedUrls.removeWhere((element) =>
+        element == "https://scout.sg/" ||
+        element == "http://intranet.scout.org.sg/");
 
-      _parsedUrls.removeWhere((element) {
-        List<ScoutBadge> list =
-            (db.scoutBadges.filter().urlEqualTo(element).findAllSync());
+    _parsedUrls.removeWhere((element) {
+      List<ScoutBadge> list =
+          (db.scoutBadges.filter().urlEqualTo(element).findAllSync());
 
-        if (list.isEmpty) {
-          // Means it is not inside
-          return false;
-        } else {
-          return true;
-        }
-      });
+      if (list.isEmpty) {
+        // Means it is not inside
+        return false;
+      } else {
+        return true;
+      }
+    });
 
-      headlessWebView.dispose();
-      await Future.forEach(_parsedUrls, (String i) async {
-        HeadlessInAppWebView tempView = HeadlessInAppWebView(
-          initialUrlRequest: URLRequest(url: Uri.parse(i)),
-        );
+    headlessWebView.dispose();
+    for (String i in _parsedUrls) {
+      HeadlessInAppWebView tempView = HeadlessInAppWebView(
+        initialUrlRequest: URLRequest(url: Uri.parse(i)),
+      );
 
-        await tempView.run();
+      await tempView.run();
 
-        await Future.delayed(const Duration(milliseconds: 5000));
+      await Future.delayed(const Duration(milliseconds: 5000));
 
-        var image =
-            await tempView.webViewController.evaluateJavascript(source: """
+      var image =
+          await tempView.webViewController.evaluateJavascript(source: """
                 JSON.stringify(
                 Array.from(document.getElementsByTagName('img'))
                   .map(img => img.src)
               )
               """);
 
-        var name =
-            await tempView.webViewController.evaluateJavascript(source: """
+      var name = await tempView.webViewController.evaluateJavascript(source: """
                 JSON.stringify(
                 Array.from(document.getElementsByTagName('h2'))
                   .map(h2 => h2.textContent)
               )
                 """);
 
-        var desc =
-            await tempView.webViewController.evaluateJavascript(source: """
+      var desc = await tempView.webViewController.evaluateJavascript(source: """
       const spanElement = document.querySelector('span.ng-binding'); 
 
 const elementsInsideSpan = Array.from(spanElement.childNodes);
@@ -149,38 +147,38 @@ JSON.stringify(contentArray);
 
       """);
 
-        String imageURL = List<String>.from(jsonDecode(image))[0];
-        String badgeName = List<String>.from(jsonDecode(name))[0];
-        String description = List<String>.from(jsonDecode(desc)).join("");
+      String imageURL = List<String>.from(jsonDecode(image))[0];
+      String badgeName = List<String>.from(jsonDecode(name))[0];
+      String description = List<String>.from(jsonDecode(desc)).join("");
 
-        var newBadge = ScoutBadge()
-          ..name = badgeName
-          ..url = i
-          ..description = description
-          ..imageURL = imageURL
-          ..parsedGoogleSheetInfo = false
-          ..completed = null
-          ..badgeGiven = null
-          ..certGiven = null;
+      var newBadge = ScoutBadge()
+        ..name = badgeName
+        ..url = i
+        ..description = description
+        ..imageURL = imageURL
+        ..parsedGoogleSheetInfo = false
+        ..completed = null
+        ..badgeGiven = null
+        ..certGiven = null;
 
-        // Add new badge to the database
+      // Add new badge to the database
 
-        await db.scoutBadges.put(newBadge);
+      // await db.scoutBadges.put(newBadge);
 
-        print(newBadge.name);
+      yield newBadge;
 
-        tempView.dispose();
-      });
+      print(newBadge.name);
 
-      if (account != null) {
-        await updateFromGSheets(account);
-      }
-
-      prefs.setBool("already_processing_badges", false);
-      return true; // Parser Successfully Completed
+      tempView.dispose();
     }
 
-    return false; // Parser didnt parse as there is already another instance of it running.
+    if (account != null) {
+      await updateFromGSheets(account);
+    }
+
+    // Parser Successfully Completed
+    // prefs.setBool("already_processing_badges", false);
+    // }
   }
 
   Future<void> updateFromGSheets(GoogleSignInAccount account) async {
