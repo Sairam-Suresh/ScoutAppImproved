@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -16,37 +15,43 @@ class ScoutBadgeCard extends HookWidget {
         context.go("/badge/${badge.name!.replaceAll(" ", "_")}");
       },
       child: SizedBox(
-          width: 250,
-          height: double.infinity,
+          // width: 250,
+          // height: double.infinity,
           child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              Center(
+                child: Image.network(
+                  badge.imageURL!,
+                  width: 100,
+                  height: 100,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(child: Container()),
-                      if (badge.completed != null)
-                        const Icon(Icons.check_circle),
-                    ],
-                  ),
-                  Image.network(
-                    badge.imageURL!,
-                    width: 120,
-                    height: 120,
-                  ),
-                  Expanded(
-                    child: AutoSizeText(
-                      badge.name!,
-                      minFontSize: 10,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 30),
-                    ),
-                  )
+                  Expanded(child: Container()),
+                  if (badge.completed != null)
+                    const CircleAvatar(
+                        radius: 12, child: Icon(Icons.check_circle)),
                 ],
               ),
-            ),
-          )),
+              // Expanded(
+              //   child: AutoSizeText(
+              //     badge.name!,
+              //     minFontSize: 10,
+              //     textAlign: TextAlign.center,
+              //     style: const TextStyle(fontSize: 30),
+              //   ),
+              // )
+            ],
+          ),
+        ),
+      )),
     );
   }
 }

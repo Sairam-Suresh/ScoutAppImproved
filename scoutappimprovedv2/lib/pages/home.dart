@@ -64,7 +64,9 @@ class _HomeState extends State<Home> {
             },
             onError: (error, trace) {},
             onDone: () {
-              doneLoadingFromOnline = true;
+              setState(() {
+                doneLoadingFromOnline = true;
+              });
             });
       });
 
@@ -139,12 +141,20 @@ class _HomeState extends State<Home> {
                       child: Padding(
                         padding: const EdgeInsets.only(
                             left: 8.0, right: 8.0, bottom: 8.0),
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
+                        child: GridView.count(
+                          crossAxisCount: 3,
+                          // scrollDirection: Axis.horizontal,
                           children: [
-                            ...(badges.value!.map((e) => (e.completed != null)
-                                ? SizedBox(child: ScoutBadgeCard(badge: e))
-                                : Container())).toList()
+                            ...((() {
+                              var tempBadges =
+                                  badges.value!.map((e) => e).toList();
+
+                              tempBadges.removeWhere(
+                                  (element) => !(element.completed != null));
+
+                              return tempBadges
+                                  .map((e) => ScoutBadgeCard(badge: e));
+                            })())
                           ],
                         ),
                       )),
@@ -163,7 +173,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Expanded(
-                    flex: 6,
+                    flex: 10,
                     child: badges.value!.isNotEmpty
                         ? account.value != null
                             ? RefreshIndicator(
