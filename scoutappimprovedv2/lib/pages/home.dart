@@ -47,29 +47,14 @@ class _HomeState extends State<Home> {
     useEffect(() {
       account.value = null;
 
-      googleSignIn.signInSilently(reAuthenticate: true).then((value) {
-        account.value = value;
-      }).onError((error, stackTrace) {
-        account.value = null;
-      });
-
       StreamSubscription<ScoutBadge?>? scoutBadgeManagerSub;
 
-      futureDB.then((obtainedDBInstance) {
-        scoutBadgeManagerSub = ScoutBadgeManager().parse(account.value).listen(
-            (value) {
-              if (value != null) {
-                obtainedDBInstance.writeTxn(() async {
-                  await obtainedDBInstance.scoutBadges.put(value);
-                });
-              }
-            },
-            onError: (error, trace) {},
-            onDone: () {
-              setState(() {
-                doneLoadingFromOnline = true;
-              });
-            });
+      googleSignIn.signInSilently(reAuthenticate: true).then((value) {
+        account.value = value;
+        scoutBadgeManagerSub = startScraper(scoutBadgeManagerSub, account);
+      }).onError((error, stackTrace) {
+        account.value = null;
+        scoutBadgeManagerSub = startScraper(scoutBadgeManagerSub, account);
       });
 
       return () async {
@@ -232,6 +217,28 @@ class _HomeState extends State<Home> {
             )
           : const Center(child: CircularProgressIndicator()),
     );
+  }
+
+  StreamSubscription<ScoutBadge?>? startScraper(
+      StreamSubscription<ScoutBadge?>? scoutBadgeManagerSub,
+      ValueNotifier<GoogleSignInAccount?> account) {
+    futureDB.then((obtainedDBInstance) {
+      scoutBadgeManagerSub = ScoutBadgeManager().parse(account.value).listen(
+          (value) {
+            if (value != null) {
+              obtainedDBInstance.writeTxn(() async {
+                await obtainedDBInstance.scoutBadges.put(value);
+              });
+            }
+          },
+          onError: (error, trace) {},
+          onDone: () {
+            setState(() {
+              doneLoadingFromOnline = true;
+            });
+          });
+    });
+    return scoutBadgeManagerSub;
   }
 
   GestureDetector buildGoogleAvatar(
