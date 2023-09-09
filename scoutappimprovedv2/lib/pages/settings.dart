@@ -70,7 +70,7 @@ class Settings extends HookWidget {
               title: Text(
                 (account.value?.displayName != null)
                     ? account.value!.displayName!
-                    : "Unknown User",
+                    : "Sign In Now",
                 style: const TextStyle(fontSize: 18),
               ),
               contentPadding: EdgeInsets.zero,
