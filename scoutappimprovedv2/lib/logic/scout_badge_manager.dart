@@ -14,10 +14,21 @@ import '../sensitive.dart';
 List<List<T>> splitList<T>(List<T> list, int parts) {
   final dividedList = <List<T>>[];
   final chunkSize = (list.length / parts).ceil();
+  var currentIndex = 0;
 
-  for (var i = 0; i < list.length; i += chunkSize) {
-    final chunk = list.sublist(i, i + chunkSize);
-    dividedList.add(chunk);
+  for (var i = 0; i < parts; i++) {
+    if (currentIndex < list.length) {
+      final chunkSizeForCurrentPart = (list.length - currentIndex < chunkSize)
+          ? (list.length - currentIndex)
+          : chunkSize;
+      final chunk =
+          list.sublist(currentIndex, currentIndex + chunkSizeForCurrentPart);
+      dividedList.add(chunk);
+      currentIndex += chunkSizeForCurrentPart;
+    } else {
+      // If we've already reached the end of the list, add an empty list.
+      dividedList.add([]);
+    }
   }
 
   return dividedList;
@@ -91,6 +102,7 @@ class ScoutBadgeManager {
         firstGetAllBadgesCompleter.complete();
       },
       onLoadError: (headlessWebView, url, code, message) {
+        print("GRRR");
         return;
       },
     );
