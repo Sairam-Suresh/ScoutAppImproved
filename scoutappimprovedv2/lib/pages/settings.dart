@@ -5,12 +5,15 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:isar/isar.dart';
 import 'package:scoutappimprovedv2/logic/scout_badge/scout_badge.dart';
 
-class Settings extends HookWidget {
-  Settings({Key? key}) : super(key: key) {
-    futureDB = getDB();
-  }
+class Settings extends StatefulHookWidget {
+  const Settings({super.key});
 
-  dynamic futureDB;
+  @override
+  State<Settings> createState() => _SettingsState();
+}
+
+class _SettingsState extends State<Settings> {
+  var futureDB = getDB();
 
   @override
   Widget build(BuildContext context) {

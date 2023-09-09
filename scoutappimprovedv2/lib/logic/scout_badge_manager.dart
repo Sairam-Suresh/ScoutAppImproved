@@ -102,7 +102,6 @@ class ScoutBadgeManager {
         firstGetAllBadgesCompleter.complete();
       },
       onLoadError: (headlessWebView, url, code, message) {
-        print("GRRR");
         return;
       },
     );
@@ -142,7 +141,6 @@ class ScoutBadgeManager {
     var urls = _parsedUrls.map((e) => e).toList();
 
     var splitUrls = splitList(urls, 50);
-    var badges = <ScoutBadge>[];
 
     for (List<String> i in splitUrls) {
       for (ScoutBadge badge
@@ -216,11 +214,6 @@ class ScoutBadgeManager {
     JSON.stringify(contentArray);
     
     """);
-
-        print(image);
-
-        print(name);
-        print(desc);
       } catch (e) {
         await Future.delayed(const Duration(milliseconds: 3000));
         await controller?.reload();
@@ -291,14 +284,6 @@ class ScoutBadgeManager {
         .values![0]
         .map((e) => e?.toString().replaceAll('\n', ""))
         .toList();
-
-    print(responseHeaderBadges.length);
-    print(responseUserDates);
-    print(combineLists(
-            groupByMarker(
-                responseHeaderStats.map((e) => e!).toList(), "Completed"),
-            responseUserDates.map((e) => e!).toList())
-        .length);
 
     for (int i = 0; i < responseHeaderBadges.length; i++) {
       var targetBadge = responseHeaderBadges[i];

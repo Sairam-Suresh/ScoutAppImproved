@@ -15,14 +15,7 @@ class ViewAllBadgesView extends StatefulHookWidget {
 }
 
 class _ViewAllBadgesViewState extends State<ViewAllBadgesView> {
-  var futureDB;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    futureDB = getDB();
-    super.initState();
-  }
+  var futureDB = getDB();
 
   @override
   Widget build(BuildContext context) {

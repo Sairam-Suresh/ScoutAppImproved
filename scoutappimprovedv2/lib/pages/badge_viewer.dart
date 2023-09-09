@@ -7,16 +7,19 @@ import 'package:isar/isar.dart';
 
 import '../logic/scout_badge/scout_badge.dart';
 
-class BadgeViewer extends HookWidget {
-  BadgeViewer({super.key, required this.name}) {
-    futureDB = getDB();
-  }
-
-  var futureDB;
-
-  StreamSubscription? sub;
+class BadgeViewer extends StatefulHookWidget {
+  const BadgeViewer({super.key, required this.name});
 
   final String name;
+
+  @override
+  State<BadgeViewer> createState() => _BadgeViewerState();
+}
+
+class _BadgeViewerState extends State<BadgeViewer> {
+  var futureDB = getDB();
+
+  StreamSubscription? sub;
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +38,9 @@ class BadgeViewer extends HookWidget {
         sub = db.data!.scoutBadges
             .watchLazy(fireImmediately: true)
             .listen((event) async {
-          print("fired!");
           badge.value = await db.data!.scoutBadges
               .filter()
-              .nameMatches(name.replaceAll("_", " "))
+              .nameMatches(widget.name.replaceAll("_", " "))
               .findFirst();
         });
       }
@@ -47,7 +49,7 @@ class BadgeViewer extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(name.replaceAll("_", " ")),
+        title: Text(widget.name.replaceAll("_", " ")),
       ),
       body: (badge.value != null)
           ? Padding(

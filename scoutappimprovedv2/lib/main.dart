@@ -24,7 +24,7 @@ final _router = GoRouter(
                   BadgeViewer(name: state.pathParameters["name"]!)),
           GoRoute(
             path: 'settings',
-            pageBuilder: (context, state) => MaterialPage(
+            pageBuilder: (context, state) => const MaterialPage(
                 child: Settings(),
                 fullscreenDialog: true,
                 maintainState: false),
@@ -40,7 +40,7 @@ final _router = GoRouter(
     GoRoute(
         path: '/welcome',
         builder: (context, state) {
-          return Welcome();
+          return const Welcome();
         }),
   ],
 );
