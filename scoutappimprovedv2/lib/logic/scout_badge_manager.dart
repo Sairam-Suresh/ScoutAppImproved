@@ -84,13 +84,16 @@ class ScoutBadgeManager {
     // prefs.setBool("already_processing_badges", true);
 
     var headlessWebView = HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(
-          url:
-              Uri.parse("https://app.scout.sg/#/scouts/scouts_gridview/scouts"),
-        ),
-        onLoadStop: (controller, url) {
-          firstGetAllBadgesCompleter.complete();
-        });
+      initialUrlRequest: URLRequest(
+        url: Uri.parse("https://app.scout.sg/#/scouts/scouts_gridview/scouts"),
+      ),
+      onLoadStop: (controller, url) {
+        firstGetAllBadgesCompleter.complete();
+      },
+      onLoadError: (headlessWebView, url, code, message) {
+        return;
+      },
+    );
     await headlessWebView.run();
 
     await firstGetAllBadgesCompleter.future;
