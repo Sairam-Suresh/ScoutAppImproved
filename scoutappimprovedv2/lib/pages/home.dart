@@ -180,18 +180,22 @@ class _HomeState extends State<Home> {
                             ? RefreshIndicator(
                                 onRefresh: () => ScoutBadgeManager()
                                     .updateFromGSheets(account.value!),
-                                child: ListView(
+                                child: ListView.builder(
                                   shrinkWrap: true,
-                                  children: badges.value!
-                                      .map((e) => ScoutBadgeListTile(badge: e))
-                                      .toList(),
+                                  itemCount: badges.value!.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) =>
+                                          ScoutBadgeListTile(
+                                              badge: badges.value![index]),
                                 ),
                               )
-                            : ListView(
+                            : ListView.builder(
                                 shrinkWrap: true,
-                                children: badges.value!
-                                    .map((e) => ScoutBadgeListTile(badge: e))
-                                    .toList(),
+                                itemCount: badges.value!.length,
+                                itemBuilder:
+                                    (BuildContext context, int index) =>
+                                        ScoutBadgeListTile(
+                                            badge: badges.value![index]),
                               )
                         : const Padding(
                             padding: EdgeInsets.all(8.0),

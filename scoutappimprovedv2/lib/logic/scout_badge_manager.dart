@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -9,6 +10,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:scoutappimprovedv2/logic/scout_badge/scout_badge.dart';
 
 import '../sensitive.dart';
+
+List<List<T>> splitList<T>(List<T> list, int parts) {
+  final dividedList = <List<T>>[];
+  final chunkSize = (list.length / parts).ceil();
+
+  for (var i = 0; i < list.length; i += chunkSize) {
+    final chunk = list.sublist(i, i + chunkSize);
+    dividedList.add(chunk);
+  }
+
+  return dividedList;
+}
 
 List<List<String>> groupByMarker(List<String> inputList, String marker) {
   List<List<String>> groupedLists = [];
@@ -65,17 +78,22 @@ class ScoutBadgeManager {
   Stream<ScoutBadge?> parse(GoogleSignInAccount? account) async* {
     var db = await _getDB();
 
+    var firstGetAllBadgesCompleter = Completer();
+
     // if (!(prefs.getBool("already_processing_badges") ?? false)) {
     // prefs.setBool("already_processing_badges", true);
 
     var headlessWebView = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(
-          url: Uri.parse(
-              "https://app.scout.sg/#/scouts/scouts_gridview/scouts")),
-    );
+        initialUrlRequest: URLRequest(
+          url:
+              Uri.parse("https://app.scout.sg/#/scouts/scouts_gridview/scouts"),
+        ),
+        onLoadStop: (controller, url) {
+          firstGetAllBadgesCompleter.complete();
+        });
     await headlessWebView.run();
 
-    await Future.delayed(const Duration(seconds: 5));
+    await firstGetAllBadgesCompleter.future;
 
     if (_parsedUrls.isEmpty) {
       var urls =
@@ -108,9 +126,15 @@ class ScoutBadgeManager {
 
     var urls = _parsedUrls.map((e) => e).toList();
 
-    for (String i in urls) {
-      yield (await parseScoutDataUrl(i));
-      _parsedUrls.remove(i);
+    var splitUrls = splitList(urls, 50);
+    var badges = <ScoutBadge>[];
+
+    for (List<String> i in splitUrls) {
+      for (ScoutBadge badge
+          in (await Future.wait(i.map((e) => parseScoutDataUrl(e))))) {
+        yield badge;
+        _parsedUrls.remove(badge.url);
+      }
     }
 
     if (account != null) {
@@ -121,29 +145,47 @@ class ScoutBadgeManager {
   }
 
   Future<ScoutBadge> parseScoutDataUrl(String i) async {
+    var waitForLoadComplete = Completer();
+    InAppWebViewController? controller;
+
     HeadlessInAppWebView tempView = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: Uri.parse(i)),
-    );
+        initialUrlRequest: URLRequest(url: Uri.parse(i)),
+        onLoadStop: (webController, url) {
+          webController.scrollBy(x: 100, y: 100);
+          controller = webController;
+          waitForLoadComplete.complete();
+        });
 
     await tempView.run();
 
-    await Future.delayed(const Duration(milliseconds: 5000));
+    await waitForLoadComplete.future;
 
-    var image = await tempView.webViewController.evaluateJavascript(source: """
+    var image = "[\"\"]";
+    var name = "[\"\"]";
+    var desc = "[]";
+
+    while (image == "[\"\"]" ||
+        name == "[\"\"]" ||
+        desc == "[]" ||
+        image == "" ||
+        name == "" ||
+        desc == "") {
+      try {
+        image = await tempView.webViewController.evaluateJavascript(source: """
                 JSON.stringify(
                 Array.from(document.getElementsByTagName('img'))
                   .map(img => img.src)
               )
               """);
 
-    var name = await tempView.webViewController.evaluateJavascript(source: """
+        name = await tempView.webViewController.evaluateJavascript(source: """
               JSON.stringify(
               Array.from(document.getElementsByTagName('h2'))
                 .map(h2 => h2.textContent)
             )
               """);
 
-    var desc = await tempView.webViewController.evaluateJavascript(source: """
+        desc = await tempView.webViewController.evaluateJavascript(source: """
     const spanElement = document.querySelector('span.ng-binding'); 
     
     const elementsInsideSpan = Array.from(spanElement.childNodes);
@@ -160,9 +202,24 @@ class ScoutBadgeManager {
     
     """);
 
+        print(image);
+
+        print(name);
+        print(desc);
+      } catch (e) {
+        await Future.delayed(const Duration(milliseconds: 3000));
+        await controller?.reload();
+        continue;
+      }
+    }
+
     String imageURL = List<String>.from(jsonDecode(image))[0];
     String badgeName = List<String>.from(jsonDecode(name))[0];
     String description = List<String>.from(jsonDecode(desc)).join("");
+
+    if (imageURL == "" || badgeName == "" || description == "") {
+      throw Exception("Some Fields are empty!");
+    }
 
     var newBadge = ScoutBadge()
       ..name = badgeName
@@ -176,7 +233,7 @@ class ScoutBadgeManager {
 
     // Add new badge to the database
 
-    // await db.scoutBadges.put(newBadge);
+    // await db.scoutBadges.put(newBadge); // We cant do this here because disposal issues
 
     tempView.dispose();
     return newBadge;
