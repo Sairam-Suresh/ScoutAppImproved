@@ -44,6 +44,9 @@ class _ViewAllBadgesViewState extends State<ViewAllBadgesView> {
     }, [db.hasData]);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("All Badges"),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
