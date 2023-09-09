@@ -203,11 +203,11 @@ class _HomeState extends State<Home> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "D:",
+                                  "Please wait...",
                                   style: TextStyle(fontSize: 40),
                                 ),
                                 Text(
-                                  "No Badges Found with that search term",
+                                  "We are collecting your badges",
                                   style: TextStyle(fontSize: 30),
                                   textAlign: TextAlign.center,
                                 ),
