@@ -147,6 +147,39 @@ class _HomeState extends State<Home> {
                         const SizedBox(
                           width: 8,
                         ),
+                        GestureDetector(
+                          onTap: () {
+                            context.push("/view_all_badges/");
+                          },
+                          child: SizedBox(
+                              height: 60,
+                              width: 60,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: !isDarkMode.value
+                                          ? Colors.grey.withOpacity(0.8)
+                                          : Colors.black.withOpacity(0.5),
+                                      blurStyle: BlurStyle.normal,
+                                      spreadRadius: 1,
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
+                                ),
+                                child: const CircleAvatar(
+                                  child: Icon(
+                                    Icons.apps,
+                                    size: 40,
+                                  ),
+                                ),
+                              )),
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
                         buildGoogleAvatar(context, doneLoadingFromOnline,
                             account, isDarkMode, googleSignIn),
                       ],
@@ -192,21 +225,11 @@ class _HomeState extends State<Home> {
                           ),
                         )),
                   if (badges.value!.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        children: [
-                          const Text(
-                            "Other Badges",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const Spacer(),
-                          FilledButton(
-                              onPressed: () {
-                                context.push("/view_all_badges/");
-                              },
-                              child: const Text("View all"))
-                        ],
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        "Other Badges",
+                        style: TextStyle(fontSize: 20),
                       ),
                     ),
                   Expanded(
