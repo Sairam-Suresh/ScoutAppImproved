@@ -51,10 +51,46 @@ class _HomeState extends State<Home> {
 
       googleSignIn.signInSilently(reAuthenticate: true).then((value) {
         account.value = value;
-        scoutBadgeManagerSub = startScraper(scoutBadgeManagerSub, account);
+        futureDB.then((obtainedDBInstance) {
+          scoutBadgeManagerSub =
+              ScoutBadgeManager().parse(account.value).listen(
+                  (value) {
+                    if (value != null) {
+                      obtainedDBInstance.writeTxn(() async {
+                        await obtainedDBInstance.scoutBadges.put(value);
+                      });
+                    } else {
+                      // Means that the network is down
+                    }
+                  },
+                  onError: (error, trace) {},
+                  onDone: () {
+                    setState(() {
+                      doneLoadingFromOnline = true;
+                    });
+                  });
+        });
       }).onError((error, stackTrace) {
         account.value = null;
-        scoutBadgeManagerSub = startScraper(scoutBadgeManagerSub, account);
+        futureDB.then((obtainedDBInstance) {
+          scoutBadgeManagerSub =
+              ScoutBadgeManager().parse(account.value).listen(
+                  (value) {
+                    if (value != null) {
+                      obtainedDBInstance.writeTxn(() async {
+                        await obtainedDBInstance.scoutBadges.put(value);
+                      });
+                    } else {
+                      // Means that the network is down
+                    }
+                  },
+                  onError: (error, trace) {},
+                  onDone: () {
+                    setState(() {
+                      doneLoadingFromOnline = true;
+                    });
+                  });
+        });
       });
 
       return () async {
@@ -198,14 +234,20 @@ class _HomeState extends State<Home> {
                             padding: EdgeInsets.all(8.0),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
                                   "Please wait...",
                                   style: TextStyle(fontSize: 40),
                                 ),
                                 Text(
-                                  "We are collecting your badges",
+                                  "We are collecting your badges.",
                                   style: TextStyle(fontSize: 30),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  "If this takes a very long time, please ensure that your device is connected to the internet and relaunch this app.",
+                                  style: TextStyle(fontSize: 15),
                                   textAlign: TextAlign.center,
                                 ),
                               ],
@@ -217,28 +259,6 @@ class _HomeState extends State<Home> {
             )
           : const Center(child: CircularProgressIndicator()),
     );
-  }
-
-  StreamSubscription<ScoutBadge?>? startScraper(
-      StreamSubscription<ScoutBadge?>? scoutBadgeManagerSub,
-      ValueNotifier<GoogleSignInAccount?> account) {
-    futureDB.then((obtainedDBInstance) {
-      scoutBadgeManagerSub = ScoutBadgeManager().parse(account.value).listen(
-          (value) {
-            if (value != null) {
-              obtainedDBInstance.writeTxn(() async {
-                await obtainedDBInstance.scoutBadges.put(value);
-              });
-            }
-          },
-          onError: (error, trace) {},
-          onDone: () {
-            setState(() {
-              doneLoadingFromOnline = true;
-            });
-          });
-    });
-    return scoutBadgeManagerSub;
   }
 
   GestureDetector buildGoogleAvatar(
