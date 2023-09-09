@@ -12,6 +12,9 @@ class ScoutBadgeListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
+        if (context.canPop()) {
+          Navigator.of(context).pop();
+        }
         context.go("/badge/${badge.name!.replaceAll(" ", "_")}");
       },
       leading: SizedBox(
