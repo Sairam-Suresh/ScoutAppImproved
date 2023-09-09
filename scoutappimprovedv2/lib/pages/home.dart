@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -130,49 +131,60 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      "Achieved Badges",
-                      style: TextStyle(fontSize: 20),
+                  if (badges.value!.isNotEmpty &&
+                      badges.value!.firstWhereOrNull((element) =>
+                              element.completed != "" &&
+                              element.completed != null) !=
+                          null)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        "Achieved Badges",
+                        style: TextStyle(fontSize: 20),
+                      ),
                     ),
-                  ),
-                  Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 8.0, right: 8.0, bottom: 8.0),
-                        child: GridView.count(
-                          crossAxisCount: 1,
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            ...((() {
-                              var tempBadges =
-                                  badges.value!.map((e) => e).toList();
+                  if (badges.value!.isNotEmpty &&
+                      badges.value!.firstWhereOrNull((element) =>
+                              element.completed != "" &&
+                              element.completed != null) !=
+                          null)
+                    Expanded(
+                        flex: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8.0, right: 8.0, bottom: 8.0),
+                          child: GridView.count(
+                            crossAxisCount: 1,
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              ...((() {
+                                var tempBadges =
+                                    badges.value!.map((e) => e).toList();
 
-                              tempBadges.removeWhere(
-                                  (element) => !(element.completed != null));
+                                tempBadges.removeWhere(
+                                    (element) => !(element.completed != null));
 
-                              return tempBadges
-                                  .map((e) => ScoutBadgeCard(badge: e));
-                            })())
-                          ],
-                        ),
-                      )),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      children: [
-                        const Text(
-                          "Other Badges",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        const Spacer(),
-                        FilledButton(
-                            onPressed: () {}, child: const Text("View all"))
-                      ],
+                                return tempBadges
+                                    .map((e) => ScoutBadgeCard(badge: e));
+                              })())
+                            ],
+                          ),
+                        )),
+                  if (badges.value!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        children: [
+                          const Text(
+                            "Other Badges",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          const Spacer(),
+                          FilledButton(
+                              onPressed: () {}, child: const Text("View all"))
+                        ],
+                      ),
                     ),
-                  ),
                   Expanded(
                     flex: 10,
                     child: badges.value!.isNotEmpty
