@@ -202,7 +202,10 @@ class _HomeState extends State<Home> {
                           ),
                           const Spacer(),
                           FilledButton(
-                              onPressed: () {}, child: const Text("View all"))
+                              onPressed: () {
+                                context.push("/view_all_badges/");
+                              },
+                              child: const Text("View all"))
                         ],
                       ),
                     ),

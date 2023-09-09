@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:scoutappimprovedv2/pages/badge_viewer.dart';
 import 'package:scoutappimprovedv2/pages/home.dart';
 import 'package:scoutappimprovedv2/pages/settings.dart';
+import 'package:scoutappimprovedv2/pages/view_all_badges.dart';
 import 'package:scoutappimprovedv2/pages/welcome.dart';
 
 void main() {
@@ -27,7 +28,11 @@ final _router = GoRouter(
                 child: Settings(),
                 fullscreenDialog: true,
                 maintainState: false),
-          )
+          ),
+          GoRoute(
+              path: 'view_all_badges',
+              pageBuilder: (context, state) =>
+                  const MaterialPage(child: ViewAllBadgesView())),
 
           // GoRoute(
           //     path: 'all_badges', builder: (context, state) => SeeAllBadgesView())
