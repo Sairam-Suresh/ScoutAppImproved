@@ -106,6 +106,7 @@ class _HomeState extends State<Home> {
           badges.value = await db.data!.scoutBadges.where().findAll();
         });
       }
+      return null;
     }, [db.hasData]);
 
     return Scaffold(
