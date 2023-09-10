@@ -31,6 +31,8 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     AsyncSnapshot<Isar> db = useFuture(futureDB);
 
+    var manager = ScoutBadgeManager();
+
     var badges = useState<List<ScoutBadge>?>(null);
 
     var account = useState<GoogleSignInAccount?>(null);
@@ -50,44 +52,42 @@ class _HomeState extends State<Home> {
       googleSignIn.signInSilently(reAuthenticate: true).then((value) {
         account.value = value;
         futureDB.then((obtainedDBInstance) {
-          scoutBadgeManagerSub =
-              ScoutBadgeManager().parse(account.value).listen(
-                  (value) {
-                    if (value != null) {
-                      obtainedDBInstance.writeTxn(() async {
-                        await obtainedDBInstance.scoutBadges.put(value);
-                      });
-                    } else {
-                      // Means that the network is down
-                    }
-                  },
-                  onError: (error, trace) {},
-                  onDone: () {
-                    setState(() {
-                      doneLoadingFromOnline = true;
-                    });
+          scoutBadgeManagerSub = manager.parse(account.value).listen(
+              (value) {
+                if (value != null) {
+                  obtainedDBInstance.writeTxn(() async {
+                    await obtainedDBInstance.scoutBadges.put(value);
                   });
+                } else {
+                  // Means that the network is down
+                }
+              },
+              onError: (error, trace) {},
+              onDone: () {
+                setState(() {
+                  doneLoadingFromOnline = true;
+                });
+              });
         });
       }).onError((error, stackTrace) {
         account.value = null;
         futureDB.then((obtainedDBInstance) {
-          scoutBadgeManagerSub =
-              ScoutBadgeManager().parse(account.value).listen(
-                  (value) {
-                    if (value != null) {
-                      obtainedDBInstance.writeTxn(() async {
-                        await obtainedDBInstance.scoutBadges.put(value);
-                      });
-                    } else {
-                      // Means that the network is down
-                    }
-                  },
-                  onError: (error, trace) {},
-                  onDone: () {
-                    setState(() {
-                      doneLoadingFromOnline = true;
-                    });
+          scoutBadgeManagerSub = manager.parse(account.value).listen(
+              (value) {
+                if (value != null) {
+                  obtainedDBInstance.writeTxn(() async {
+                    await obtainedDBInstance.scoutBadges.put(value);
                   });
+                } else {
+                  // Means that the network is down
+                }
+              },
+              onError: (error, trace) {},
+              onDone: () {
+                setState(() {
+                  doneLoadingFromOnline = true;
+                });
+              });
         });
       });
 
@@ -234,8 +234,8 @@ class _HomeState extends State<Home> {
                     child: badges.value!.isNotEmpty
                         ? account.value != null
                             ? RefreshIndicator(
-                                onRefresh: () => ScoutBadgeManager()
-                                    .updateFromGSheets(account.value!),
+                                onRefresh: () =>
+                                    manager.updateFromGSheets(account.value!),
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: badges.value!.length,
