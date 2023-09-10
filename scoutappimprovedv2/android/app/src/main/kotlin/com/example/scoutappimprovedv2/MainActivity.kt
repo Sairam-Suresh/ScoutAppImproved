@@ -1,4 +1,4 @@
-package com.example.scoutappimprovedv2
+package com.apprefineinc.scoutsappenhanced
 
 import io.flutter.embedding.android.FlutterActivity
 

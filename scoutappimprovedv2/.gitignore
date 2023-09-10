@@ -56,3 +56,4 @@ app.*.map.json
 /lib/sensitive.dart
 /sensitive/
 /android/signing/
+/android/signing_release.properties

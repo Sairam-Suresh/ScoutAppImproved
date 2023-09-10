@@ -29,7 +29,7 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    namespace "com.example.scoutappimprovedv2"
+    namespace "com.apprefineinc.scoutsappenhanced"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -46,33 +46,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    signingConfigs {
-        debug {
-            def props = new Properties()
-
-            def fileInputStream = new FileInputStream(file('../signing/signing_debug.properties'))
-            props.load(fileInputStream)
-            fileInputStream.close()
-
-            storeFile = file(props['storeFilePath'])
-            storePassword = props['storePassword']
-            keyAlias = props['keyAlias']
-            keyPassword = props['keyPassword']
-        }
-
-        release {
-            def props = new Properties()
-
-            def fileInputStream = new FileInputStream(file('../signing/signing_release.properties'))
-            props.load(fileInputStream)
-            fileInputStream.close()
-
-            storeFile = file(props['storeFilePath'])
-            storePassword = props['storePassword']
-            keyAlias = props['keyAlias']
-        }
-    }
-
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.apprefineinc.scoutsappenhanced"
@@ -84,11 +57,22 @@ android {
         versionName flutterVersionName
     }
 
+    signingConfigs {
+        release {
+           storePassword localProperties['storePassword']
+           keyAlias localProperties['keyAlias']
+           keyPassword localProperties['keyPassword']
+           storeFile localProperties['storeFile'] ? file(localProperties['storeFile']) : null
+        }
+
+
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
     }
 }
