@@ -109,34 +109,32 @@ class ScoutBadgeManager {
 
     await firstGetAllBadgesCompleter.future;
 
-    if (_parsedUrls.isEmpty) {
-      var urls =
-          await headlessWebView.webViewController.evaluateJavascript(source: """
+    var urlsObtained =
+        await headlessWebView.webViewController.evaluateJavascript(source: """
               JSON.stringify(
                 Array.from(document.getElementsByTagName('a'))
                   .map(img => img.href)
               )
               """);
-      _parsedUrls = List<String>.from(jsonDecode(urls));
+    _parsedUrls = List<String>.from(jsonDecode(urlsObtained));
 
-      // Filter out the garbage
-      _parsedUrls.removeWhere((element) =>
-          element == "https://scout.sg/" ||
-          element == "http://intranet.scout.org.sg/");
+    // Filter out the garbage
+    _parsedUrls.removeWhere((element) =>
+        element == "https://scout.sg/" ||
+        element == "http://intranet.scout.org.sg/");
 
-      _parsedUrls.removeWhere((element) {
-        List<ScoutBadge> list =
-            (db.scoutBadges.filter().urlEqualTo(element).findAllSync());
+    _parsedUrls.removeWhere((element) {
+      List<ScoutBadge> list =
+          (db.scoutBadges.filter().urlEqualTo(element).findAllSync());
 
-        if (list.isEmpty) {
-          // Means it is not inside
-          return false;
-        } else {
-          return true;
-        }
-      });
-      await headlessWebView.dispose();
-    }
+      if (list.isEmpty) {
+        // Means it is not inside
+        return false;
+      } else {
+        return true;
+      }
+    });
+    await headlessWebView.dispose();
 
     var urls = _parsedUrls.map((e) => e).toList();
 
