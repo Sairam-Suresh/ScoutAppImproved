@@ -106,7 +106,6 @@ class _HomeState extends State<Home> {
           badges.value = await db.data!.scoutBadges.where().findAll();
         });
       }
-      return null;
     }, [db.hasData]);
 
     return Scaffold(
@@ -293,7 +292,7 @@ class _HomeState extends State<Home> {
       GoogleSignIn googleSignIn) {
     return GestureDetector(
       onTap: () {
-        context.push("/settings/");
+        context.go("/settings/");
       },
       child: SizedBox(
         height: 60,
