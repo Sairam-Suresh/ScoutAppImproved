@@ -50,7 +50,7 @@ android {
         debug {
             def props = new Properties()
 
-            def fileInputStream = new FileInputStream(file('../signing_debug.properties'))
+            def fileInputStream = new FileInputStream(file('../signing/signing_debug.properties'))
             props.load(fileInputStream)
             fileInputStream.close()
 
@@ -58,6 +58,18 @@ android {
             storePassword = props['storePassword']
             keyAlias = props['keyAlias']
             keyPassword = props['keyPassword']
+        }
+
+        release {
+            def props = new Properties()
+
+            def fileInputStream = new FileInputStream(file('../signing/signing_release.properties'))
+            props.load(fileInputStream)
+            fileInputStream.close()
+
+            storeFile = file(props['storeFilePath'])
+            storePassword = props['storePassword']
+            keyAlias = props['keyAlias']
         }
     }
 
