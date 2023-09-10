@@ -15,8 +15,7 @@ final _router = GoRouter(
   routes: [
     GoRoute(
         path: '/',
-        pageBuilder: (context, state) =>
-            const MaterialPage(child: Home(), maintainState: false),
+        pageBuilder: (context, state) => const NoTransitionPage(child: Home()),
         routes: [
           GoRoute(
               path: 'badge/:name',
@@ -33,14 +32,11 @@ final _router = GoRouter(
               path: 'view_all_badges',
               pageBuilder: (context, state) =>
                   const MaterialPage(child: ViewAllBadgesView())),
-
-          // GoRoute(
-          //     path: 'all_badges', builder: (context, state) => SeeAllBadgesView())
         ]),
     GoRoute(
         path: '/welcome',
-        builder: (context, state) {
-          return const Welcome();
+        pageBuilder: (context, state) {
+          return const NoTransitionPage(child: Welcome());
         }),
   ],
 );
