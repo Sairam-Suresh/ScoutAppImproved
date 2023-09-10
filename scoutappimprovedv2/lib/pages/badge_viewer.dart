@@ -119,7 +119,7 @@ class _BadgeViewerState extends State<BadgeViewer> {
                 ],
               ),
             )
-          : const CircularProgressIndicator(),
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 }
