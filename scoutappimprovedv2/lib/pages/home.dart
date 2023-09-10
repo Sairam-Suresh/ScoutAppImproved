@@ -110,6 +110,7 @@ class _HomeState extends State<Home> {
     }, [db.hasData]);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: badges.value != null // && sheetsApi.value != null
           ? SafeArea(
               bottom: false,
