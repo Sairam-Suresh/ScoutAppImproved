@@ -54,3 +54,4 @@ app.*.map.json
 /android/signing.properties
 /android/signing_debug.properties
 /lib/sensitive.dart
+/sensitive/
