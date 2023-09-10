@@ -142,39 +142,39 @@ class _HomeState extends State<Home> {
                             },
                           ),
                         ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            context.push("/view_all_badges/");
-                          },
-                          child: SizedBox(
-                              height: 60,
-                              width: 60,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: !isDarkMode.value
-                                          ? Colors.grey.withOpacity(0.8)
-                                          : Colors.black.withOpacity(0.5),
-                                      blurStyle: BlurStyle.normal,
-                                      spreadRadius: 1,
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 6),
-                                    ),
-                                  ],
-                                ),
-                                child: const CircleAvatar(
-                                  child: Icon(
-                                    Icons.apps,
-                                    size: 40,
-                                  ),
-                                ),
-                              )),
-                        ),
+                        // const SizedBox(
+                        //   width: 8,
+                        // ),
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     context.push("/view_all_badges/");
+                        //   },
+                        //   child: SizedBox(
+                        //       height: 60,
+                        //       width: 60,
+                        //       child: Container(
+                        //         decoration: BoxDecoration(
+                        //           shape: BoxShape.circle,
+                        //           boxShadow: [
+                        //             BoxShadow(
+                        //               color: !isDarkMode.value
+                        //                   ? Colors.grey.withOpacity(0.8)
+                        //                   : Colors.black.withOpacity(0.5),
+                        //               blurStyle: BlurStyle.normal,
+                        //               spreadRadius: 1,
+                        //               blurRadius: 5,
+                        //               offset: const Offset(0, 6),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //         child: const CircleAvatar(
+                        //           child: Icon(
+                        //             Icons.apps,
+                        //             size: 40,
+                        //           ),
+                        //         ),
+                        //       )),
+                        // ),
                         const SizedBox(
                           width: 8,
                         ),
