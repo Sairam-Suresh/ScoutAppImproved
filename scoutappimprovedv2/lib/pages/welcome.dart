@@ -37,7 +37,7 @@ class _InterMediaryState extends State<Welcome> {
     }, [sharedPref.hasData]);
 
     return showIntro.value == null
-        ? Material(
+        ? const Material(
             child: Center(
               child: CircularProgressIndicator(),
             ),
@@ -63,16 +63,25 @@ class _InterMediaryState extends State<Welcome> {
                     bodyWidget: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          "This App has more interactivity than the main Scouts app, and has more features!",
-                          textAlign: TextAlign.center,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Swipe to continue",
+                              textAlign: TextAlign.center,
+                            ),
+                            Icon(Icons.arrow_forward)
+                          ],
                         ),
                       ],
                     ),
                     image: SafeArea(
                       child: Center(
                           child: Image.network(
-                              "https://app.scout.sg/img/main_view/adult.png")),
+                        "https://app.scout.sg/img/main_view/adult.png",
+                        height: 250,
+                        width: 250,
+                      )),
                     ),
                   ),
                   PageViewModel(
@@ -80,14 +89,40 @@ class _InterMediaryState extends State<Welcome> {
                     bodyWidget: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Locally downloaded Scout Badges"),
-                        Text("Something else here")
+                        Text(
+                          "1. Locally downloaded Scout Badges",
+                          style: TextStyle(fontSize: 25),
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          "2. Scout badges are synced with your achievements!",
+                          style: TextStyle(fontSize: 25),
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          "3. More to come!",
+                          style: TextStyle(fontSize: 25),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: 50,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Swipe to continue",
+                              textAlign: TextAlign.center,
+                            ),
+                            Icon(Icons.arrow_forward)
+                          ],
+                        ),
                       ],
                     ),
                     image: const Center(
                         child: Icon(
                       Icons.dataset_outlined,
-                      size: 100,
+                      size: 250,
                     )),
                   ),
                   PageViewModel(
@@ -126,8 +161,8 @@ class _InterMediaryState extends State<Welcome> {
                     ),
                     image: const Center(
                         child: Icon(
-                      Icons.dataset_outlined,
-                      size: 100,
+                      Icons.pause,
+                      size: 250,
                     )),
                   )
                 ],
