@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:isar/isar.dart';
 import 'package:scoutappimprovedv2/logic/scout_badge/scout_badge.dart';
@@ -85,36 +84,36 @@ class _SettingsState extends State<Settings> {
             const SizedBox(
               height: 8,
             ),
-            const Text(
-              "Danger Zone",
-            ),
-            ListTile(
-              onTap: () {
-                var allData = db.data!.scoutBadges
-                    .where()
-                    .findAllSync()
-                    .map((e) => e.id)
-                    .toList();
-                if (db.hasData) {
-                  db.data!.writeTxn(() {
-                    return db.data!.scoutBadges.deleteAll(allData);
-                  });
-                }
-
-                context.pop();
-
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Deleted ${allData.length} badges")));
-              },
-              title: Text(
-                "Clear Caches",
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-              leading: Icon(
-                Icons.delete_forever,
-                color: Theme.of(context).colorScheme.error,
-              ),
-            ),
+            // const Text(
+            //   "Danger Zone",
+            // ),
+            // ListTile(
+            //   onTap: () {
+            //     var allData = db.data!.scoutBadges
+            //         .where()
+            //         .findAllSync()
+            //         .map((e) => e.id)
+            //         .toList();
+            //     if (db.hasData) {
+            //       db.data!.writeTxn(() {
+            //         return db.data!.scoutBadges.deleteAll(allData);
+            //       });
+            //     }
+            //
+            //     context.pop();
+            //
+            //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            //         content: Text("Deleted ${allData.length} badges")));
+            //   },
+            //   title: Text(
+            //     "Clear Caches",
+            //     style: TextStyle(color: Theme.of(context).colorScheme.error),
+            //   ),
+            //   leading: Icon(
+            //     Icons.delete_forever,
+            //     color: Theme.of(context).colorScheme.error,
+            //   ),
+            // ),
           ],
         ),
       ),
