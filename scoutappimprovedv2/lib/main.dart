@@ -15,7 +15,11 @@ final _router = GoRouter(
   routes: [
     GoRoute(
         path: '/',
-        pageBuilder: (context, state) => const NoTransitionPage(child: Home()),
+        pageBuilder: (context, state) => CustomTransitionPage(
+            child: const Home(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) => const Home(),
+            maintainState: false),
         routes: [
           GoRoute(
               path: 'badge/:name',
