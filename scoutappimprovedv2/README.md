@@ -1,16 +1,7 @@
-# scoutappimprovedv2
+# Scouts App Enhanced
 
-Improve the scouts app V2
+This is the repo for the new Scouts App, created by AppRefine Inc.
 
-## Getting Started
+In order to run this app, run ``flutter pub get`` and ensure that you have properly configured this app with the provided firebase credentials.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+To run the app, use ``flutter run``.
