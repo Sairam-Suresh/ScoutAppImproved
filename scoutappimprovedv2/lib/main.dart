@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:scoutappimprovedv2/pages/announcements.dart';
-import 'package:scoutappimprovedv2/pages/badge_viewer.dart';
-import 'package:scoutappimprovedv2/pages/experiences.dart';
-import 'package:scoutappimprovedv2/pages/home.dart';
+import 'package:scoutappimprovedv2/pages/announcements/announcements.dart';
+import 'package:scoutappimprovedv2/pages/badge_catalogue/badge_viewer.dart';
+import 'package:scoutappimprovedv2/pages/badge_catalogue/home.dart';
+import 'package:scoutappimprovedv2/pages/badge_catalogue/view_all_badges.dart';
+import 'package:scoutappimprovedv2/pages/experiences/experiences.dart';
 import 'package:scoutappimprovedv2/pages/root.dart';
-import 'package:scoutappimprovedv2/pages/settings.dart';
-import 'package:scoutappimprovedv2/pages/view_all_badges.dart';
+import 'package:scoutappimprovedv2/pages/settings/settings.dart';
 import 'package:scoutappimprovedv2/pages/welcome.dart';
 
 void main() {

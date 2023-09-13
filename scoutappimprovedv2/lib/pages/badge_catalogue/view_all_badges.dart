@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:isar/isar.dart';
 import 'package:scoutappimprovedv2/widgets/scout_badge_card_detail.dart';
 
-import '../logic/scout_badge/scout_badge.dart';
+import '../../logic/scout_badge/scout_badge.dart';
 
 class ViewAllBadgesView extends StatefulHookWidget {
   const ViewAllBadgesView({super.key});

@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:isar/isar.dart';
 
-import '../logic/scout_badge/scout_badge.dart';
+import '../../logic/scout_badge/scout_badge.dart';
 
 class BadgeViewer extends StatefulHookWidget {
   const BadgeViewer({super.key, required this.name});

@@ -9,8 +9,8 @@ import 'package:isar/isar.dart';
 import 'package:scoutappimprovedv2/widgets/scout_badge_card.dart';
 import 'package:scoutappimprovedv2/widgets/scout_badge_list_tile.dart';
 
-import '../logic/scout_badge/scout_badge.dart';
-import '../logic/scout_badge_manager.dart';
+import '../../logic/scout_badge/scout_badge.dart';
+import '../../logic/scout_badge_manager.dart';
 
 class Home extends StatefulHookWidget {
   const Home({super.key});
