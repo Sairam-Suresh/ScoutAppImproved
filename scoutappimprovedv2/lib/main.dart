@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:scoutappimprovedv2/pages/announcements.dart';
 import 'package:scoutappimprovedv2/pages/badge_viewer.dart';
+import 'package:scoutappimprovedv2/pages/experiences.dart';
 import 'package:scoutappimprovedv2/pages/home.dart';
 import 'package:scoutappimprovedv2/pages/root.dart';
 import 'package:scoutappimprovedv2/pages/settings.dart';
@@ -20,11 +22,17 @@ final _router = GoRouter(
           return const NoTransitionPage(child: Welcome());
         }),
     ShellRoute(
-      pageBuilder: (context, state, child) => NoTransitionPage(
+      pageBuilder: (context, state, child) => CustomTransitionPage(
           child: RootPage(
-        currentNavLink: state.uri.toString(),
-        child: child,
-      )),
+            currentNavLink: state.uri.toString(),
+            child: child,
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+              FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+          maintainState: true),
       routes: [
         GoRoute(
             path: '/',
@@ -45,6 +53,30 @@ final _router = GoRouter(
                   pageBuilder: (context, state) =>
                       const MaterialPage(child: ViewAllBadgesView())),
             ]),
+        GoRoute(
+          path: '/experiences',
+          pageBuilder: (context, state) => CustomTransitionPage(
+              child: const Experiences(),
+              fullscreenDialog: true,
+              maintainState: false,
+              transitionsBuilder: (BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation,
+                      Widget child) =>
+                  const Experiences()),
+        ),
+        GoRoute(
+          path: '/announcements',
+          pageBuilder: (context, state) => CustomTransitionPage(
+              child: const Announcements(),
+              fullscreenDialog: true,
+              maintainState: false,
+              transitionsBuilder: (BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation,
+                      Widget child) =>
+                  const Announcements()),
+        ),
         GoRoute(
           path: '/settings',
           pageBuilder: (context, state) => CustomTransitionPage(

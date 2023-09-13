@@ -17,13 +17,21 @@ class _RootPageState extends State<RootPage> {
 
   @override
   void didUpdateWidget(covariant RootPage oldWidget) {
-    if (widget.currentNavLink == "/settings") {
+    if (widget.currentNavLink == "/") {
+      setState(() {
+        _currentIndex = 0;
+      });
+    } else if (widget.currentNavLink == "/announcements") {
+      setState(() {
+        _currentIndex = 2;
+      });
+    } else if (widget.currentNavLink == "/experiences") {
       setState(() {
         _currentIndex = 1;
       });
-    } else {
+    } else if (widget.currentNavLink == "/settings") {
       setState(() {
-        _currentIndex = 0;
+        _currentIndex = 3;
       });
     }
     super.didUpdateWidget(oldWidget);
@@ -37,7 +45,11 @@ class _RootPageState extends State<RootPage> {
     });
     if (index == 0) {
       context.go('/');
-    } else {
+    } else if (index == 2) {
+      context.go("/announcements");
+    } else if (index == 1) {
+      context.go("/experiences");
+    } else if (index == 3) {
       context.go("/settings");
     }
   }
@@ -51,6 +63,9 @@ class _RootPageState extends State<RootPage> {
         destinations: const [
           // the appearance of each tab is defined with a [NavigationDestination] widget
           NavigationDestination(label: 'Overview', icon: Icon(Icons.home)),
+          NavigationDestination(label: 'Experiences', icon: Icon(Icons.forest)),
+          NavigationDestination(
+              label: 'Announcements', icon: Icon(Icons.notifications)),
           NavigationDestination(label: 'Settings', icon: Icon(Icons.settings)),
         ],
         onDestinationSelected: (indexAt) {
